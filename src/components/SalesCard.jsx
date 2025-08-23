@@ -32,8 +32,8 @@ const SalesCard = ({ product, index = 0 }) => {
 
   return (
     <Link
-      to={`/product-detail-view?id=${product.id}`}
-      className="group block bg-white rounded-3xl overflow-hidden shadow-xl hover:shadow-2xl transition-all duration-500 hover:scale-105 hover:-translate-y-2 relative"
+      to={`/product/${product.id}`}
+      className="group flex flex-col bg-white rounded-3xl overflow-hidden shadow-xl hover:shadow-2xl transition-all duration-500 hover:scale-105 hover:-translate-y-2 relative h-full"
       style={{ animationDelay: `${index * 150}ms` }}
     >
       {/* Sale Banner */}
@@ -44,7 +44,7 @@ const SalesCard = ({ product, index = 0 }) => {
       </div>
 
       {/* Enhanced Product Image */}
-      <div className="relative aspect-[3/4] overflow-hidden bg-gradient-to-br from-gray-100 to-gray-200 mt-8">
+      <div className="relative aspect-square overflow-hidden bg-gradient-to-br from-gray-100 to-gray-200 mt-8">
         <Image
           src={product.image}
           alt={product.name}
@@ -74,7 +74,7 @@ const SalesCard = ({ product, index = 0 }) => {
       </div>
 
       {/* Enhanced Product Info */}
-      <div className="p-6 space-y-4">
+      <div className="p-6 space-y-4 flex flex-col flex-1">
         {/* Brand */}
         <p className="text-sm text-red-600 uppercase tracking-wider font-bold">
           {product?.brand}
@@ -125,12 +125,12 @@ const SalesCard = ({ product, index = 0 }) => {
             ))}
           </div>
           <span className="text-sm text-gray-500 font-medium">
-            ({product?.reviewCount || 0})
+            ({product?.reviews || 0})
           </span>
         </div>
 
         {/* Add to Cart Button */}
-        <div className="pt-4">
+        <div className="mt-auto">
           <div className="w-full bg-gradient-to-r from-red-500 to-orange-500 text-white py-3 rounded-2xl text-center font-bold group-hover:from-red-600 group-hover:to-orange-600 transition-all duration-300 shadow-lg">
             Add to Cart
           </div>

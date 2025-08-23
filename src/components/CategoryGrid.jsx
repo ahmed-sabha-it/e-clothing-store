@@ -67,7 +67,7 @@ const CategoryGrid = () => {
               Find exactly what you're looking for in our carefully curated collections
             </p>
           </div>
-          <Link to="/product-catalog-browse" className="hidden lg:block">
+          <Link to="/category/all" className="hidden lg:block">
             <Button 
               variant="gradient" 
               iconName="ArrowRight" 

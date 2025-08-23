@@ -40,7 +40,8 @@ const CartPage = () => {
   }
 
   return (
-    <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8 animate-fade-in">
+    <div className="min-h-screen bg-gradient-to-br from-orange-50 via-amber-50 to-yellow-50 dark:from-gray-800 dark:via-gray-900 dark:to-black">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8 animate-fade-in">
       <div className="flex items-center gap-3 mb-8 animate-fade-in animation-delay-150">
         <ShoppingBag className="h-8 w-8 text-primary" />
         <h1 className="text-3xl font-bold text-foreground">Shopping Cart</h1>
@@ -53,7 +54,7 @@ const CartPage = () => {
           {cartItems.map((item, index) => (
             <div 
               key={`${item.id}-${item.size}-${item.color}`} 
-              className="bg-card border border-border rounded-lg p-6 shadow-sm hover:shadow-md transition-shadow duration-200 animate-fade-in"
+              className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-6 shadow-sm hover:shadow-md transition-shadow duration-200 animate-fade-in"
               style={{ animationDelay: `${450 + (index * 100)}ms` }}
             >
               <div className="flex gap-6">
@@ -102,20 +103,20 @@ const CartPage = () => {
                       <span className="text-sm text-muted-foreground">each</span>
                     </div>
                     
-                    <div className="flex items-center gap-3">
-                      <div className="flex items-center border border-border rounded-lg bg-background">
+                    <div className="flex items-center  gap-3">
+                      <div className="flex items-center  bg-primary rounded-full border border-border rounded-lg bg-background">
                         <button
                           onClick={() => updateQuantity(item.id, item.size, item.color, Math.max(0, item.quantity - 1))}
-                          className="px-3 py-2 hover:bg-muted transition-colors"
+                          className="px-3 py-2 bg-primary hover:bg-muted transition-colors"
                         >
-                          <Minus className="h-4 w-4" />
+                          <Minus className="" />
                         </button>
-                        <span className="px-3 py-2 text-sm font-medium">{item.quantity}</span>
+                        <span className="px-3 py-2 bg-primary text-sm font-medium">{item.quantity}</span>
                         <button
                           onClick={() => updateQuantity(item.id, item.size, item.color, item.quantity + 1)}
-                          className="px-3 py-2 hover:bg-muted transition-colors"
+                          className="px-3 py-2 hover:bg-muted bg-primary transition-colors"
                         >
-                          <Plus className="h-4 w-4" />
+                          <Plus className="rounded-all border-left-1 border-1 border-white" />
                         </button>
                       </div>
                       
@@ -135,7 +136,7 @@ const CartPage = () => {
 
         {/* Order Summary */}
         <div className="animate-fade-in animation-delay-600">
-          <div className="bg-card border border-border rounded-lg p-6 shadow-sm sticky top-8">
+          <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-6 shadow-sm sticky top-8">
             <h2 className="text-xl font-semibold text-foreground mb-6">Order Summary</h2>
             
             {/* Coupon Section */}
@@ -163,8 +164,9 @@ const CartPage = () => {
                       }}
                       variant="outline"
                       size="sm"
+                      className='bg-primary'
                     >
-                      <Tag className="h-4 w-4 mr-1" />
+                      <Tag className="h-4 w-4  mr-1" />
                       Apply
                     </Button>
                   </div>
@@ -237,6 +239,7 @@ const CartPage = () => {
             </Link>
           </div>
         </div>
+      </div>
       </div>
     </div>
   );

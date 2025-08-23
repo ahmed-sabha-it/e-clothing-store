@@ -26,7 +26,7 @@ const Logo: React.FC<LogoProps> = ({ size = 'sm', className = '' }) => {
       <div className="w-12 h-12 bg-gradient-to-r from-orange-400 to-orange-500 rounded-2xl flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-300">
         <Icon name="Shirt" size={24} color="white" />
       </div>
-      <span className={cn(textSize, 'font-bold gradient-text hidden sm:block')}>StyleHub</span>
+      <span className={cn(textSize, 'font-bold gradient-text hidden sm:block')}>Chicora</span>
     </Link>
   );
 };

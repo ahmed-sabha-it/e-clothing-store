@@ -10,11 +10,11 @@ const Footer = () => {
     {
       title: "Account",
       links: [
-        { name: "My Account", href: "/user-account-dashboard" },
+        { name: "My Account", href: "/profile" },
         { name: "Order History", href: "/order-confirmation" },
         { name: "Wishlist", href: "/wishlist" },
-        { name: "Track Order", href: "#" },
-        { name: "Sign In", href: "#" }
+        // { name: "Track Order", href: "#" },
+        { name: "Log In", href: "#" }
       ]
     },
     {
@@ -23,7 +23,7 @@ const Footer = () => {
         { name: "About Us", href: "/about" },
         { name: "Contact Us", href: "/contact" },
         { name: "Features", href: "/features" },
-        { name: "Support", href: "#" },
+     
       ]
     },
     {
@@ -149,7 +149,7 @@ const Footer = () => {
           <div className="flex flex-col md:flex-row items-center justify-between gap-6">
             <div className="text-gray-700 dark:text-gray-400 text-base flex items-center">
               <Icon name="Copyright" size={16} className="mr-2" />
-               { new Date().getFullYear()} StyleHub Store. All rights reserved.
+               { new Date().getFullYear()} Chicora Store. All rights reserved.
             </div>
             
           </div>

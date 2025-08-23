@@ -6,7 +6,7 @@ import { useWishlist } from '@/contexts/WishlistContext';
 import { useCart } from '@/contexts/CartContext';
 import { useToast } from '@/hooks/use-toast';
 
-const EnhancedProductCard = ({ product, index = 0 }) => {
+const NewProductCard = ({ product, index = 0 }) => {
   const { addToWishlist, removeFromWishlist, isInWishlist } = useWishlist();
   const { addToCart } = useCart();
   const { toast } = useToast();
@@ -55,16 +55,13 @@ const EnhancedProductCard = ({ product, index = 0 }) => {
     });
   };
 
-  // Default gradient if not provided
-  const gradient = product.gradient || "from-blue-500 to-orange-500";
-
   return (
     <Link
       to={`/product/${product.id}`}
       className="group flex flex-col bg-white rounded-3xl overflow-hidden shadow-xl hover:shadow-2xl transition-all duration-500 hover:-translate-y-3 hover:scale-105 h-full"
       style={{ animationDelay: `${index * 200}ms` }}
     >
-      {/* Enhanced Product Image */}
+      {/* Product Image with NEW Badge */}
       <div className="relative aspect-square overflow-hidden bg-gradient-to-br from-gray-100 to-gray-200">
         <Image
           src={product.image}
@@ -72,29 +69,11 @@ const EnhancedProductCard = ({ product, index = 0 }) => {
           className="w-full h-full object-cover transition-all duration-700 group-hover:scale-120"
         />
         
-        {/* Enhanced Popular Badge */}
-        {product?.isPopular && (
-          <div className={`absolute top-6 left-6 bg-gradient-to-r from-orange-400 to-red-500 text-white px-4 py-2 rounded-2xl text-sm font-bold shadow-lg backdrop-blur-sm`}>
-            <Icon name="Star" size={14} className="inline mr-2" />
-            POPULAR
-          </div>
-        )}
-
-        {/* New Badge */}
-        {product?.isNew && (
-          <div className="absolute top-6 left-6 bg-gradient-to-r from-orange-400 to-red-500 text-white px-4 py-2 rounded-2xl text-sm font-bold shadow-lg backdrop-blur-sm">
-            <Icon name="Sparkles" size={14} className="inline mr-2" />
-            NEW
-          </div>
-        )}
-
-        {/* Sale Badge */}
-        {/* {product?.isOnSale && product?.originalPrice && (
-          <div className="absolute top-6 left-6 bg-gradient-to-r from-red-500 to-pink-500 text-white px-4 py-2 rounded-2xl text-sm font-bold shadow-lg backdrop-blur-sm">
-            <Icon name="Tag" size={14} className="inline mr-2" />
-            SALE
-          </div>
-        )} */}
+        {/* Prominent NEW Badge - Always visible for new arrivals */}
+        <div className="absolute top-6 left-6 bg-gradient-to-r from-emerald-500 to-teal-500 text-white px-5 py-2.5 rounded-2xl text-sm font-bold shadow-lg backdrop-blur-sm animate-pulse">
+          <Icon name="Sparkles" size={16} className="inline mr-2" />
+          NEW ARRIVAL
+        </div>
 
         {/* Enhanced Wishlist Button */}
         <button 
@@ -111,17 +90,25 @@ const EnhancedProductCard = ({ product, index = 0 }) => {
             }`}
           />
         </button>
+
+        {/* New Arrival Glow Effect */}
+        <div className="absolute inset-0 bg-gradient-to-t from-transparent via-transparent to-emerald-500/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
       </div>
 
       {/* Enhanced Product Info */}
       <div className="p-6 space-y-5 flex flex-col flex-1">
-        {/* Brand */}
-        <p className="text-sm text-orange-700 uppercase tracking-wider font-bold">
-          {product?.brand || product?.category}
-        </p>
+        {/* Brand with NEW indicator */}
+        <div className="flex items-center justify-between">
+          <p className="text-sm text-emerald-600 uppercase tracking-wider font-bold">
+            {product?.brand || product?.category}
+          </p>
+          <span className="text-xs text-emerald-500 font-semibold bg-emerald-50 px-2 py-1 rounded-full">
+            NEW
+          </span>
+        </div>
 
         {/* Product Name */}
-        <h3 className="text-lg font-bold text-gray-900 line-clamp-2 group-hover:text-orange-600 transition-colors duration-300">
+        <h3 className="text-lg font-bold text-gray-900 line-clamp-2 group-hover:text-emerald-600 transition-colors duration-300">
           {product?.name}
         </h3>
 
@@ -150,7 +137,7 @@ const EnhancedProductCard = ({ product, index = 0 }) => {
             {product.colors.slice(0, 4).map((color, colorIndex) => (
               <div
                 key={colorIndex}
-                className="w-5 h-5 rounded-full border-2 border-gray-200 shadow-sm"
+                className="w-5 h-5 rounded-full border-2 border-gray-200 shadow-sm ring-2 ring-emerald-100"
                 style={{ backgroundColor: color.toLowerCase() }}
               />
             ))}
@@ -162,7 +149,7 @@ const EnhancedProductCard = ({ product, index = 0 }) => {
           </div>
         )}
 
-        {/* Enhanced Price */}
+        {/* Enhanced Price with NEW styling */}
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             <span className="text-2xl font-bold text-gray-900">
@@ -174,13 +161,18 @@ const EnhancedProductCard = ({ product, index = 0 }) => {
               </span>
             )}
           </div>
+          {/* New arrival indicator */}
+          <div className="flex items-center gap-1 text-emerald-500">
+            <Icon name="TrendingUp" size={16} />
+            <span className="text-xs font-semibold">FRESH</span>
+          </div>
         </div>
 
         {/* Add to Cart Button */}
         <div className="mt-auto">
           <button
             onClick={handleAddToCart}
-            className="w-full bg-gradient-to-r from-orange-500 to-red-500 text-white py-3 rounded-2xl text-center font-bold hover:from-orange-600 hover:to-red-600 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105"
+            className="w-full bg-gradient-to-r from-emerald-500 to-teal-500 text-white py-3 rounded-2xl text-center font-bold hover:from-emerald-600 hover:to-teal-600 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105"
           >
             Add to Cart
           </button>
@@ -190,4 +182,4 @@ const EnhancedProductCard = ({ product, index = 0 }) => {
   );
 };
 
-export default EnhancedProductCard;
+export default NewProductCard;

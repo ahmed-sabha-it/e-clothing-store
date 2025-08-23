@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import Icon from '../../../components/AppIcon';
 import Button from '../../../components/ui/Button';
 import AddressForm from './AddressForm';
+import { useScrollToTop } from '../../../utils/scrollToTop';
 
 const AddressBook = ({ addresses, onAddAddress, onEditAddress, onDeleteAddress, onSetDefault }) => {
   const [showAddForm, setShowAddForm] = useState(false);
@@ -24,6 +25,7 @@ const AddressBook = ({ addresses, onAddAddress, onEditAddress, onDeleteAddress, 
   };
 
   if (showAddForm) {
+    // useScrollToTop();
     return (
       <AddressForm
         onSave={handleAddAddress}

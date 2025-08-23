@@ -4,66 +4,10 @@ import Icon from '@/components/AppIcon';
 import Button from '@/components/ui/Button';
 import Image from '@/components/AppImage';
 import EnhancedProductCard from '@/components/EnhancedProductCard';
+import { getProductsByCategory } from '@/data/products';
 
 const AccessoriesSection = ({ loading = false }) => {
-  const formatPrice = (price) => {
-    return new Intl.NumberFormat('en-US', {
-      style: 'currency',
-      currency: 'USD'
-    }).format(price);
-  };
-
-  // Enhanced accessories data with gradients
-  const accessories = [
-    {
-      id: 17,
-      name: "Luxury Watch Collection",
-      brand: "TimeSync",
-      price: 299.99,
-      image: "https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=400&h=500&fit=crop",
-      rating: 4.9,
-      reviewCount: 156,
-      category: "watches",
-      isPopular: true,
-      gradient: "from-amber-400 to-orange-500"
-    },
-    {
-      id: 18,
-      name: "Designer Sunglasses",
-      brand: "SunStyle",
-      price: 149.99,
-      image: "https://images.unsplash.com/photo-1511499767150-a48a237f0083?w=400&h=500&fit=crop",
-      rating: 4.7,
-      reviewCount: 89,
-      category: "eyewear",
-      isPopular: true,
-      gradient: "from-blue-500 to-cyan-400"
-    },
-    {
-      id: 19,
-      name: "Premium Leather Belt",
-      brand: "CraftLeather",
-      price: 79.99,
-      image: "https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=400&h=500&fit=crop",
-      rating: 4.8,
-      reviewCount: 234,
-      category: "belts",
-      isPopular: false,
-      gradient: "from-amber-600 to-yellow-500"
-    },
-    {
-      id: 20,
-      name: "Statement Jewelry Set",
-      brand: "Elegance",
-      price: 189.99,
-      image: "https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?w=400&h=500&fit=crop",
-      rating: 4.6,
-      reviewCount: 167,
-      category: "jewelry",
-      isPopular: true,
-      gradient: "from-pink-500 to-rose-400"
-    }
-  ];
+  const accessories = getProductsByCategory('accessories').slice(0, 4);
 
   const LoadingSkeleton = () => (
     <div className="bg-white rounded-3xl overflow-hidden shadow-xl">
@@ -103,7 +47,7 @@ const AccessoriesSection = ({ loading = false }) => {
             </p>
           </div>
           {/* Desktop View All Button */}
-          <Link to="/product-catalog-browse?category=accessories" className="hidden lg:block">
+          <Link to="/category/accessories" className="hidden lg:block">
             <Button 
               variant="gradient" 
               iconName="ArrowRight" 
@@ -136,7 +80,7 @@ const AccessoriesSection = ({ loading = false }) => {
 
         {/* Mobile View All Button */}
         <div className="mt-12 text-center lg:hidden">
-          <Link to="/product-catalog-browse?category=accessories">
+          <Link to="/category/accessories">
             <Button 
               variant="gradient" 
               iconName="ArrowRight" 

@@ -17,6 +17,7 @@ import ProductPage from "./pages/ProductPage";
 import CartPage from "./pages/CartPage";
 import CheckoutPage from "./pages/CheckoutPage";
 import WishlistPage from "./pages/WishlistPage";
+import SearchPage from "./pages/SearchPage";
 import NotFound from "./pages/NotFound";
 // Static Pages
 import About from "./pages/static-pages/About";
@@ -57,6 +58,7 @@ const App = () => (
                     <Route path="/cart" element={<CartPage />} />
                     <Route path="/checkout" element={<CheckoutPage />} />
                     <Route path="/wishlist" element={<WishlistPage />} />
+                    <Route path="/search" element={<SearchPage />} />
                     {/* Static Pages */}
                     <Route path="/about" element={<About />} />
                     <Route path="/contact" element={<Contact />} />

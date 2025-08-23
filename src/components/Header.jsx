@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
-import { Search, ShoppingCart, Heart, User, Sun, Moon, Menu, X,LogIn } from 'lucide-react';
-import { useTheme } from '@/contexts/ThemeContext';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { ShoppingCart, Heart, User, Menu, X, Search, Sun, Moon } from 'lucide-react';
 import { useCart } from '@/contexts/CartContext';
 import { useWishlist } from '@/contexts/WishlistContext';
 import { useAuth } from '@/contexts/AuthContext';
-import { Link } from 'react-router-dom';
+import { useTheme } from '@/contexts/ThemeContext';
 import Logo from '@/components/Logo';
 import  Button  from '@/components/ui/Button';
 const Header = () => {
@@ -13,8 +13,12 @@ const Header = () => {
   const { wishlistItems } = useWishlist();
   const { isAuthenticated } = useAuth();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
+  const location = useLocation();
+  const navigate = useNavigate();
 
   const navigation = [
+    { name: 'All', href: '/category/all' },
     { name: 'Men', href: '/category/men' },
     { name: 'Women', href: '/category/women' },
     { name: 'Kids', href: '/category/kids' },
@@ -22,42 +26,45 @@ const Header = () => {
     { name: 'New Arrivals', href: '/category/new-arrivals' },
     { name: 'Sale', href: '/category/sale' },
   ];
+
+  const handleSearch = (e) => {
+    e.preventDefault();
+    if (searchQuery.trim()) {
+      navigate(`/search?q=${encodeURIComponent(searchQuery.trim())}`);
+    } else {
+      navigate('/search');
+    }
+  };
   return (
     <header className="bg-gradient-to-br from-orange-50 via-amber-50 to-yellow-50 dark:from-gray-800 dark:via-gray-900 dark:to-black border-b border-border sticky top-0 z-50">
       <div className="w-full px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
-          <Logo size="sm" className="mr-auto" />
+          <Logo size="sm" className="flex-shrink-0" />
 
           {/* Desktop Navigation */}
-          <nav className="hidden md:flex space-x-6 lg:space-x-8 ml-6 sm:ml-10 lg:ml-20">
+          <nav className="hidden md:flex space-x-4 lg:space-x-6 xl:space-x-8 ml-4 lg:ml-8">
             {navigation.map((item) => (
               <Link
                 key={item.name}
                 to={item.href}
-                className="text-foreground hover:text-primary transition-colors duration-200 font-medium"
+                className={`transition-colors duration-200 font-medium whitespace-nowrap ${
+                  location.pathname === item.href
+                    ? 'text-primary border-b-2 border-primary pb-1'
+                    : 'text-foreground hover:text-primary'
+                }`}
               >
                 {item.name}
               </Link>
             ))}
           </nav>
 
-          {/* Search Bar */}
-          <div className="hidden lg:flex items-center max-w-md flex-1 mx-8">
-            <div className="relative w-full">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-              <input
-                type="text"
-                placeholder="Search products..."
-                className="w-full pl-10 pr-4 py-2  border border-primary  bg-gradient-to-br from-orange-50 via-amber-50 to-yellow-50 dark:from-gray-800 dark:via-gray-900 dark:to-black rounded-lg  text-foreground outline-none ring-1 ring-primary focus:ring-2 border-transparent"
-              />
-            </div>
-          </div>
+         
 
           {/* Right Actions */}
-          <div className="flex items-center space-x-4">
+          <div className="flex items-center space-x-2 lg:space-x-4 ml-2 lg:ml-4">
             {/* Theme Toggle */}
-            <button
+            {/* <button
               onClick={toggleTheme}
               className="p-2 rounded-lg hover:bg-muted transition-colors duration-200"
               aria-label="Toggle theme"
@@ -67,8 +74,17 @@ const Header = () => {
               ) : (
                 <Moon className="h-5 w-5 text-foreground" />
               )}
+            </button> */}
+ {/* Search Icon */}
+ <div className="flex items-center ml-4 lg:ml-6">
+            <button
+              onClick={() => navigate('/search')}
+              className="p-2 rounded-lg hover:bg-muted transition-colors duration-200"
+              aria-label="Search products"
+            >
+              <Search className="h-5 w-5 text-foreground" />
             </button>
-
+          </div>
             {/* Wishlist */}
             <Link
               to="/wishlist"
@@ -110,7 +126,7 @@ const Header = () => {
                     iconSize={16}
                     className="px-6 py-3 bg-gradient-to-r from-orange-500 to-amber-500 text-white rounded text-sm font-bold shadow-lg font-medium hover:scale-105 transition-transform duration-300"
                   >
-                    LogIn
+                    Log In
                   </Button>
                 </Link>
               )}
@@ -141,7 +157,11 @@ const Header = () => {
               <Link
                 key={item.name}
                 to={item.href}
-                className="block px-3 py-2 rounded-md text-foreground hover:text-primary hover:bg-muted transition-colors duration-200"
+                className={`block px-3 py-2 rounded-md transition-colors duration-200 ${
+                  location.pathname === item.href
+                    ? 'text-primary bg-primary/10 border-l-4 border-primary'
+                    : 'text-foreground hover:text-primary hover:bg-muted'
+                }`}
                 onClick={() => setIsMenuOpen(false)}
               >
                 {item.name}
@@ -149,14 +169,13 @@ const Header = () => {
             ))}
             {/* Mobile Search */}
             <div className="px-3 py-2">
-              <div className="relative">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                <input
-                  type="text"
-                  placeholder="Search products..."
-                  className="w-full pl-10 pr-4 py-2 border border-border rounded-lg bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
-                />
-              </div>
+              <button
+                onClick={() => { navigate('/search'); setIsMenuOpen(false); }}
+                className="w-full flex items-center gap-3 px-3 py-2 rounded-md transition-colors duration-200 text-foreground hover:text-primary hover:bg-muted"
+              >
+                <Search className="h-4 w-4" />
+                <span>Search Products</span>
+              </button>
             </div>
           </div>
         </div>

@@ -1,16 +1,17 @@
 import { Link } from 'react-router-dom';
 import React from 'react';
 import EnhancedProductCard from './EnhancedProductCard';
-import { getProductsByCategory } from '@/data/products';
+import NewProductCard from './NewProductCard';
+import { newArrivalProducts } from '@/data/products';
 import { useCart } from '@/contexts/CartContext';
 import { useToast } from '@/hooks/use-toast';
 import Icon from '@/components/AppIcon';
 import Button from '@/components/ui/Button';
-
+import { toast } from 'react-toastify';
 const FeaturedProducts = () => {
   const { addToCart } = useCart();
-  const { toast } = useToast();
-  const featuredProducts = getProductsByCategory('all').slice(0, 8);
+  // const { toast } = useToast();
+  const featuredProducts = newArrivalProducts.slice(0, 4);
 
   const handleQuickAdd = (product) => {
     // Add with default size and color
@@ -27,10 +28,9 @@ const FeaturedProducts = () => {
       category: product.category
     });
 
-    toast({
-      title: "Added to cart",
-      description: `${product.name} has been added to your cart.`,
-    });
+    toast.success(
+      "Added to cart "+ `${product.name} has been added to your cart.`,
+    "")
   };
 
   return (
@@ -49,17 +49,17 @@ const FeaturedProducts = () => {
             <div className="space-y-2">
               <div className="inline-flex items-center px-6 py-3 bg-gradient-to-r from-orange-500 to-amber-500 text-white rounded-full text-sm font-bold shadow-lg">
                 <Icon name="Star" size={16} className="mr-2" />
-                Featured Collection
+               New Arrival
               </div>
               <h2 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-orange-600 via-amber-600 to-yellow-600 bg-clip-text text-transparent">
-                Featured Products
+                New Products
               </h2>
             </div>
             <p className="text-xl text-gray-600 max-w-2xl">
-              Discover our handpicked selection of trending items you'll absolutely love
+              Discover our Newest selection of  items you'll absolutely love
             </p>
           </div>
-          <Link to="/product-catalog-browse?sort=newest" className="hidden lg:block">
+          <Link to="/category/new-arrivals" className="hidden lg:block">
             <Button 
               variant="gradient" 
               iconName="ArrowRight" 
@@ -73,7 +73,7 @@ const FeaturedProducts = () => {
  
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-10">
           {featuredProducts.map((product, index) => (
-            <EnhancedProductCard 
+            <NewProductCard 
               key={product.id} 
               product={product}
               index={index}
@@ -82,7 +82,7 @@ const FeaturedProducts = () => {
         </div>
         {/* Mobile View All Button */}
         <div className="mt-12 text-center lg:hidden">
-          <Link to="/product-catalog-browse?sort=newest">
+          <Link to="/category/new-arrivals">
             <Button 
               variant="gradient" 
               iconName="ArrowRight" 

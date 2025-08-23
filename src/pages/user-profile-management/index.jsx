@@ -9,7 +9,7 @@ import LoyaltyCard from './components/LoyaltyCard';
 import PersonalInfoForm from './components/PersonalInfoForm';
 import AddressBook from './components/AddressBook';
 import OrderHistory from './components/OrderHistory';
-import WishlistSection from './components/WishlistSection';
+// import WishlistSection from './components/WishlistSection';
 import PreferencesSettings from './components/PreferencesSettings';
 import ConfirmationModal from './components/ConfirmationModal';
 
@@ -26,10 +26,10 @@ const UserProfileManagement = () => {
   const [userData, setUserData] = useState({
     name: 'John Doe',
     email: 'john.doe@example.com',
-    phone: '+1 (555) 123-4567',
+    phone: '+963 996-944-873',
     avatar: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face',
     memberSince: '2022',
-    location: 'New York, NY',
+    location: 'Lattakia-Syria',
     dateOfBirth: '1990-05-15',
     gender: 'male'
   });
@@ -41,7 +41,6 @@ const UserProfileManagement = () => {
     totalSpent: 1250,
     benefits: [
       'Free shipping on all orders',
-      '15% off regular prices',
       'Early access to sales',
       'Birthday month discount'
     ]
@@ -151,44 +150,44 @@ const UserProfileManagement = () => {
     }
   ]);
 
-  const [wishlistItems, setWishlistItems] = useState([
-    {
-      id: 1,
-      name: 'Premium Leather Jacket',
-      brand: 'StyleCraft',
-      price: 199.99,
-      originalPrice: 249.99,
-      image: 'https://images.unsplash.com/photo-1551028719-00167b16eac5?w=300&h=300&fit=crop',
-      selectedSize: 'L',
-      selectedColor: 'Black',
-      inStock: true,
-      dateAdded: '2024-01-12T09:00:00Z'
-    },
-    {
-      id: 2,
-      name: 'Casual Sneakers',
-      brand: 'ComfortWalk',
-      price: 89.99,
-      originalPrice: null,
-      image: 'https://images.unsplash.com/photo-1549298916-b41d501d3772?w=300&h=300&fit=crop',
-      selectedSize: '10',
-      selectedColor: 'White',
-      inStock: false,
-      dateAdded: '2024-01-08T16:30:00Z'
-    },
-    {
-      id: 3,
-      name: 'Elegant Evening Dress',
-      brand: 'GlamourLine',
-      price: 159.99,
-      originalPrice: 199.99,
-      image: 'https://images.unsplash.com/photo-1566479179817-c0b0b5b1b9e8?w=300&h=300&fit=crop',
-      selectedSize: 'M',
-      selectedColor: 'Navy',
-      inStock: true,
-      dateAdded: '2024-01-05T11:15:00Z'
-    }
-  ]);
+  // const [wishlistItems, setWishlistItems] = useState([
+  //   {
+  //     id: 1,
+  //     name: 'Premium Leather Jacket',
+  //     brand: 'StyleCraft',
+  //     price: 199.99,
+  //     originalPrice: 249.99,
+  //     image: 'https://images.unsplash.com/photo-1551028719-00167b16eac5?w=300&h=300&fit=crop',
+  //     selectedSize: 'L',
+  //     selectedColor: 'Black',
+  //     inStock: true,
+  //     dateAdded: '2024-01-12T09:00:00Z'
+  //   },
+  //   {
+  //     id: 2,
+  //     name: 'Casual Sneakers',
+  //     brand: 'ComfortWalk',
+  //     price: 89.99,
+  //     originalPrice: null,
+  //     image: 'https://images.unsplash.com/photo-1549298916-b41d501d3772?w=300&h=300&fit=crop',
+  //     selectedSize: '10',
+  //     selectedColor: 'White',
+  //     inStock: false,
+  //     dateAdded: '2024-01-08T16:30:00Z'
+  //   },
+  //   {
+  //     id: 3,
+  //     name: 'Elegant Evening Dress',
+  //     brand: 'GlamourLine',
+  //     price: 159.99,
+  //     originalPrice: 199.99,
+  //     image: 'https://images.unsplash.com/photo-1566479179817-c0b0b5b1b9e8?w=300&h=300&fit=crop',
+  //     selectedSize: 'M',
+  //     selectedColor: 'Navy',
+  //     inStock: true,
+  //     dateAdded: '2024-01-05T11:15:00Z'
+  //   }
+  // ]);
 
   const [preferences, setPreferences] = useState({
     notifications: {
@@ -228,7 +227,7 @@ const UserProfileManagement = () => {
   const tabs = [
     { id: 'overview', label: 'Overview', icon: 'User' },
     { id: 'orders', label: 'Orders', icon: 'Package' },
-    { id: 'wishlist', label: 'Wishlist', icon: 'Heart' },
+    // { id: 'wishlist', label: 'Wishlist', icon: 'Heart' },
     { id: 'addresses', label: 'Addresses', icon: 'MapPin' },
     { id: 'preferences', label: 'Settings', icon: 'Settings' }
   ];
@@ -288,22 +287,22 @@ const UserProfileManagement = () => {
     );
   };
 
-  const handleRemoveFromWishlist = (itemId) => {
-    setWishlistItems(prev => prev.filter(item => item.id !== itemId));
-  };
+  // const handleRemoveFromWishlist = (itemId) => {
+  //   setWishlistItems(prev => prev.filter(item => item.id !== itemId));
+  // };
 
-  const handleMoveToCart = (item) => {
-    // TODO: Integrate with cart API
-    // console.log('Moving to cart:', item);
-    // Remove from wishlist after moving to cart
-    handleRemoveFromWishlist(item.id);
-  };
+  // const handleMoveToCart = (item) => {
+  //   // TODO: Integrate with cart API
+  //   // console.log('Moving to cart:', item);
+  //   // Remove from wishlist after moving to cart
+  //   handleRemoveFromWishlist(item.id);
+  // };
 
-  const handleClearWishlist = () => {
-    if (window.confirm('Are you sure you want to clear your entire wishlist?')) {
-      setWishlistItems([]);
-    }
-  };
+  // const handleClearWishlist = () => {
+  //   if (window.confirm('Are you sure you want to clear your entire wishlist?')) {
+  //     setWishlistItems([]);
+  //   }
+  // };
 
   const handleSavePreferences = (newPreferences) => {
     setPreferences(newPreferences);
@@ -438,10 +437,10 @@ const UserProfileManagement = () => {
                           <div className="text-2xl font-bold text-foreground">{orders.length}</div>
                           <div className="text-sm text-muted-foreground">Total Orders</div>
                         </div>
-                        <div className="text-center p-4 bg-orange-100/50 dark:bg-gray-700/50 rounded-md">
+                        {/* <div className="text-center p-4 bg-orange-100/50 dark:bg-gray-700/50 rounded-md">
                           <div className="text-2xl font-bold text-foreground">{wishlistItems.length}</div>
                           <div className="text-sm text-muted-foreground">Wishlist Items</div>
-                        </div>
+                        </div> */}
                         <div className="text-center p-4 bg-orange-100/50 dark:bg-gray-700/50 rounded-md">
                           <div className="text-2xl font-bold text-foreground">{addresses.length}</div>
                           <div className="text-sm text-muted-foreground">Saved Addresses</div>

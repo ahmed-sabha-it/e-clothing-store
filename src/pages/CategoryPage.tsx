@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useParams } from 'react-router-dom';
 import EnhancedProductCard from '@/components/EnhancedProductCard';
 import SalesCard from '@/components/SalesCard';
+import NewProductCard from "@/components/NewProductCard"
 import { getProductsByCategory } from '@/data/products';
 import { useCart } from '@/contexts/CartContext';
 import { useToast } from '@/hooks/use-toast';
@@ -208,17 +209,19 @@ const CategoryPage = () => {
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-10">
-            {filteredProducts.map((product, index) => (
-              category === 'sale' ? (
-                <SalesCard key={product.id} product={product} index={index} />
-              ) : (
-                <EnhancedProductCard 
-                  key={product.id}
-                  product={product}
-                  index={index}
-                />
-              )
-            ))}
+            {filteredProducts.map((product, index) => {
+              // SIMPLE RENDERING LOGIC
+              if (product.salePrice && product.discount) {
+                // Product has sale price = use SalesCard
+                return <SalesCard key={product.id} product={product} index={index} />;
+              } else if (category === "new-arrivals" || product.id.startsWith('new-')) {
+                // New arrivals category or product ID starts with 'new-' = use NewProductCard
+                return <NewProductCard key={product.id} product={product} index={index} />;
+              } else {
+                // Normal product = use EnhancedProductCard
+                return <EnhancedProductCard key={product.id} product={product} index={index} />;
+              }
+            })}
           </div>
 
           {filteredProducts.length === 0 && (

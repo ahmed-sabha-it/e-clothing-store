@@ -7,31 +7,31 @@ import { Checkbox } from '../../../components/ui/Checkbox';
 const PreferencesSettings = ({ preferences, onSave }) => {
   const { isDark, toggleTheme } = useTheme();
   const [settings, setSettings] = useState({
-    notifications: {
-      email: {
-        orderUpdates: preferences?.notifications?.email?.orderUpdates ?? true,
-        promotions: preferences?.notifications?.email?.promotions ?? true,
-        newArrivals: preferences?.notifications?.email?.newArrivals ?? false,
-        priceDrops: preferences?.notifications?.email?.priceDrops ?? true,
-        newsletter: preferences?.notifications?.email?.newsletter ?? false
-      },
-      sms: {
-        orderUpdates: preferences?.notifications?.sms?.orderUpdates ?? true,
-        promotions: preferences?.notifications?.sms?.promotions ?? false,
-        deliveryAlerts: preferences?.notifications?.sms?.deliveryAlerts ?? true
-      },
-      push: {
-        orderUpdates: preferences?.notifications?.push?.orderUpdates ?? true,
-        promotions: preferences?.notifications?.push?.promotions ?? false,
-        newArrivals: preferences?.notifications?.push?.newArrivals ?? false
-      }
-    },
-    privacy: {
-      profileVisibility: preferences?.privacy?.profileVisibility ?? 'private',
-      dataSharing: preferences?.privacy?.dataSharing ?? false,
-      personalizedAds: preferences?.privacy?.personalizedAds ?? true,
-      analytics: preferences?.privacy?.analytics ?? true
-    },
+    // notifications: {
+    //   email: {
+    //     orderUpdates: preferences?.notifications?.email?.orderUpdates ?? true,
+    //     promotions: preferences?.notifications?.email?.promotions ?? true,
+    //     newArrivals: preferences?.notifications?.email?.newArrivals ?? false,
+    //     priceDrops: preferences?.notifications?.email?.priceDrops ?? true,
+    //     newsletter: preferences?.notifications?.email?.newsletter ?? false
+    //   },
+    //   sms: {
+    //     orderUpdates: preferences?.notifications?.sms?.orderUpdates ?? true,
+    //     promotions: preferences?.notifications?.sms?.promotions ?? false,
+    //     deliveryAlerts: preferences?.notifications?.sms?.deliveryAlerts ?? true
+    //   },
+    //   push: {
+    //     orderUpdates: preferences?.notifications?.push?.orderUpdates ?? true,
+    //     promotions: preferences?.notifications?.push?.promotions ?? false,
+    //     newArrivals: preferences?.notifications?.push?.newArrivals ?? false
+    //   }
+    // },
+    // privacy: {
+    //   profileVisibility: preferences?.privacy?.profileVisibility ?? 'private',
+    //   dataSharing: preferences?.privacy?.dataSharing ?? false,
+    //   personalizedAds: preferences?.privacy?.personalizedAds ?? true,
+    //   analytics: preferences?.privacy?.analytics ?? true
+    // },
     shopping: {
       currency: preferences?.shopping?.currency ?? 'USD',
       language: preferences?.shopping?.language ?? 'en',
@@ -48,28 +48,28 @@ const PreferencesSettings = ({ preferences, onSave }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [activeSection, setActiveSection] = useState('notifications');
 
-  const handleNotificationChange = (category, type, value) => {
-    setSettings(prev => ({
-      ...prev,
-      notifications: {
-        ...prev.notifications,
-        [category]: {
-          ...prev.notifications[category],
-          [type]: value
-        }
-      }
-    }));
-  };
+  // const handleNotificationChange = (category, type, value) => {
+  //   setSettings(prev => ({
+  //     ...prev,
+  //     notifications: {
+  //       ...prev.notifications,
+  //       [category]: {
+  //         ...prev.notifications[category],
+  //         [type]: value
+  //       }
+  //     }
+  //   }));
+  // };
 
-  const handlePrivacyChange = (setting, value) => {
-    setSettings(prev => ({
-      ...prev,
-      privacy: {
-        ...prev.privacy,
-        [setting]: value
-      }
-    }));
-  };
+  // const handlePrivacyChange = (setting, value) => {
+  //   setSettings(prev => ({
+  //     ...prev,
+  //     privacy: {
+  //       ...prev.privacy,
+  //       [setting]: value
+  //     }
+  //   }));
+  // };
 
   const handleShoppingChange = (setting, value) => {
     setSettings(prev => ({
@@ -108,8 +108,8 @@ const PreferencesSettings = ({ preferences, onSave }) => {
   };
 
   const sections = [
-    { id: 'notifications', label: 'Notifications', icon: 'Bell' },
-    { id: 'privacy', label: 'Privacy', icon: 'Shield' },
+    // { id: 'notifications', label: 'Notifications', icon: 'Bell' },
+    // { id: 'privacy', label: 'Privacy', icon: 'Shield' },
     { id: 'shopping', label: 'Shopping', icon: 'ShoppingBag' },
     { id: 'theme', label: 'Appearance', icon: 'Palette' }
   ];
@@ -142,7 +142,7 @@ const PreferencesSettings = ({ preferences, onSave }) => {
         {/* Section Content */}
         <div className="flex-1">
           {/* Notifications Section */}
-          {activeSection === 'notifications' && (
+          {/* {activeSection === 'notifications' && (
             <div className="space-y-6">
               <div>
                 <h3 className="text-lg font-semibold text-foreground mb-4">Email Notifications</h3>
@@ -204,9 +204,9 @@ const PreferencesSettings = ({ preferences, onSave }) => {
                 </div>
               </div>
             </div>
-          )}
+          )} */}
 
-          {/* Privacy Section */}
+          {/* Privacy Section
           {activeSection === 'privacy' && (
             <div className="space-y-6">
               <div>
@@ -250,7 +250,7 @@ const PreferencesSettings = ({ preferences, onSave }) => {
                 </div>
               </div>
             </div>
-          )}
+          )} */}
 
           {/* Shopping Section */}
           {activeSection === 'shopping' && (

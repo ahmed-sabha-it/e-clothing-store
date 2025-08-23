@@ -81,7 +81,8 @@ const CheckoutPage = () => {
   const total = discountedSubtotal + tax;
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 animate-fade-in">
+    <div className="min-h-screen bg-gradient-to-br from-orange-50 via-amber-50 to-yellow-50 dark:from-gray-800 dark:via-gray-900 dark:to-black">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 animate-fade-in">
       <h1 className="text-3xl font-bold text-foreground mb-8 animate-fade-in animation-delay-150">Checkout</h1>
       
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
@@ -89,7 +90,7 @@ const CheckoutPage = () => {
         <div className="space-y-8 animate-fade-in animation-delay-300">
           <form onSubmit={handleSubmit} className="space-y-8">
             {/* Personal Information */}
-            <div className="bg-card border border-border rounded-lg p-6 animate-fade-in animation-delay-450">
+            <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-6 animate-fade-in animation-delay-450">
               <div className="flex items-center gap-2 mb-4">
                 <User className="h-5 w-5 text-primary" />
                 <h2 className="text-xl font-semibold text-foreground">Personal Information</h2>
@@ -146,7 +147,7 @@ const CheckoutPage = () => {
             </div>
 
             {/* Shipping Address */}
-            <div className="bg-card border border-border rounded-lg p-6 animate-fade-in animation-delay-600">
+            <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-6 animate-fade-in animation-delay-600">
               <div className="flex items-center gap-2 mb-4">
                 <MapPin className="h-5 w-5 text-primary" />
                 <h2 className="text-xl font-semibold text-foreground">Shipping Address</h2>
@@ -213,7 +214,7 @@ const CheckoutPage = () => {
             </div>
 
             {/* Payment Information */}
-            <div className="bg-card border border-border rounded-lg p-6 animate-fade-in animation-delay-750">
+            <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-6 animate-fade-in animation-delay-750">
               <div className="flex items-center gap-2 mb-4">
                 <CreditCard className="h-5 w-5 text-primary" />
                 <h2 className="text-xl font-semibold text-foreground">Payment Information</h2>
@@ -291,7 +292,7 @@ const CheckoutPage = () => {
 
         {/* Order Summary */}
         <div className="lg:col-span-1 animate-fade-in animation-delay-1050">
-          <div className="bg-card border border-border rounded-lg p-6 sticky top-8">
+          <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-6 sticky top-8">
             <h2 className="text-xl font-semibold text-foreground mb-6">Order Summary</h2>
             
             <div className="space-y-4 mb-6">
@@ -351,6 +352,7 @@ const CheckoutPage = () => {
             </div>
           </div>
         </div>
+      </div>
       </div>
     </div>
   );
