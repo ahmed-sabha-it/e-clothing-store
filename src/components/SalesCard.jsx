@@ -59,7 +59,7 @@ const SalesCard = ({ product, index = 0 }) => {
         )}
 
         {/* Timer Badge */}
-        <div className="absolute top-4 right-4 bg-black/80 backdrop-blur-sm text-white px-3 py-2 rounded-2xl text-xs font-bold">
+        <div className="absolute top-4 right-4 bg-orange-500/90 backdrop-blur-sm text-white px-3 py-2 rounded-2xl text-xs font-bold">
           ⏰ Limited Time
         </div>
 

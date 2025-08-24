@@ -73,27 +73,27 @@ const AdminPage = () => {
     { label: 'Total Sales', value: '$45,231', change: '+12.5%', icon: DollarSign },
     { label: 'Total Orders', value: '1,234', change: '+8.2%', icon: ShoppingBag },
     { label: 'Active Users', value: '892', change: '+15.3%', icon: Users },
-    { label: 'Revenue Growth', value: '23.5%', change: '+5.1%', icon: TrendingUp },
+   
   ];
 
   return (
-    <div className={`flex min-h-screen bg-background transition-colors duration-300 ${theme}`}>
+    <div className={`flex min-h-screen bg-gradient-to-br from-orange-50 via-amber-50 to-yellow-50 dark:from-gray-800 dark:via-gray-900 dark:to-black transition-colors duration-300 ${theme}`}>
       {/* Mobile Header */}
-      <div className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-4 py-3 bg-card/95 border-b backdrop-blur-lg lg:hidden">
+      <div className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-4 py-3 bg-gradient-to-r from-orange-50/95 via-amber-50/95 to-yellow-50/95 dark:from-gray-800/95 dark:via-gray-900/95 dark:to-black/95 border-b border-orange-200/50 dark:border-gray-700/50 backdrop-blur-lg lg:hidden">
         <Sheet open={isMobileMenuOpen} onOpenChange={setIsMobileMenuOpen}>
           <SheetTrigger asChild>
             <Button variant="ghost" size="icon" className="animate-fade-in">
               <Menu className="h-5 w-5" />
             </Button>
           </SheetTrigger>
-          <SheetContent side="left" className="bg-card">
+          <SheetContent side="left" className="bg-gradient-to-br from-orange-50 via-amber-50 to-yellow-50 dark:from-gray-800 dark:via-gray-900 dark:to-black border-r border-orange-200/50 dark:border-gray-700/50">
             <div className="flex flex-col h-full">
               <div className="sr-only">
                 <h2>Admin Navigation Menu</h2>
                 <p>Navigate through different admin sections</p>
               </div>
-              <div className="mb-8 pb-6 border-b animate-fade-in animation-delay-150">
-                <h2 className="text-2xl font-bold bg-gradient-to-r from-primary to-purple-600 bg-clip-text text-transparent">
+              <div className="mb-8 pb-6 border-b border-orange-200/50 dark:border-gray-700/50 animate-fade-in animation-delay-150">
+                <h2 className="text-2xl font-bold bg-gradient-to-r from-orange-500 to-amber-500 bg-clip-text text-transparent">
                   Admin Panel
                 </h2>
               </div>
@@ -107,8 +107,8 @@ const AdminPage = () => {
                     }}
                     className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200 animate-fade-in ${
                       activeTab === item.id 
-                        ? 'bg-primary text-primary-foreground hover:bg-primary/90' 
-                        : 'text-muted-foreground hover:text-foreground hover:bg-accent'
+                        ? 'bg-gradient-to-r from-orange-500 to-amber-500 text-white shadow-lg hover:from-orange-600 hover:to-amber-600' 
+                        : 'text-muted-foreground hover:text-foreground hover:bg-orange-100/50 dark:hover:bg-gray-800/50'
                     }`}
                     style={{ animationDelay: `${300 + index * 100}ms` }}
                   >
@@ -117,7 +117,7 @@ const AdminPage = () => {
                   </button>
                 ))}
               </nav>
-              <div className="mt-auto pt-6 border-t space-y-3 animate-fade-in animation-delay-600">
+              <div className="mt-auto pt-6 border-t border-orange-200/50 dark:border-gray-700/50 space-y-3 animate-fade-in animation-delay-600">
                 <Button
                   variant="ghost"
                   size="icon"
@@ -160,9 +160,9 @@ const AdminPage = () => {
       </div>
 
       {/* Desktop Sidebar */}
-      <aside className="fixed left-0 top-0 bottom-0 w-64 bg-card border-r flex flex-col p-6 z-40 hidden lg:flex">
-        <div className="mb-8 pb-6 border-b animate-fade-in">
-          <h2 className="text-2xl font-bold bg-gradient-to-r from-primary to-purple-600 bg-clip-text text-transparent">
+      <aside className="fixed left-0 top-0 bottom-0 w-64 bg-gradient-to-br from-orange-50/80 via-amber-50/80 to-yellow-50/80 dark:from-gray-800/90 dark:via-gray-900/90 dark:to-black/90 border-r border-orange-200/50 dark:border-gray-700/50 backdrop-blur-sm flex flex-col p-6 z-40 hidden lg:flex">
+        <div className="mb-8 pb-6 border-b border-orange-200/50 dark:border-gray-700/50 animate-fade-in">
+          <h2 className="text-2xl font-bold bg-gradient-to-r from-orange-500 to-amber-500 bg-clip-text text-transparent">
             Admin Panel
           </h2>
         </div>
@@ -173,8 +173,8 @@ const AdminPage = () => {
               onClick={() => setActiveTab(item.id)}
               className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200 animate-fade-in ${
                 activeTab === item.id 
-                  ? 'bg-primary text-primary-foreground hover:bg-primary/90' 
-                  : 'text-muted-foreground hover:text-foreground hover:bg-accent'
+                  ? 'bg-gradient-to-r from-orange-500 to-amber-500 text-white shadow-lg hover:from-orange-600 hover:to-amber-600' 
+                  : 'text-muted-foreground hover:text-foreground hover:bg-orange-100/50 dark:hover:bg-gray-800/50'
               }`}
               style={{ animationDelay: `${150 + index * 100}ms` }}
             >
@@ -188,7 +188,7 @@ const AdminPage = () => {
             variant="outline"
             size="sm"
             onClick={toggleTheme}
-            className="w-full"
+            className="w-full border-orange-200 dark:border-gray-700 hover:bg-orange-100/50 dark:hover:bg-gray-800/50"
           >
             {theme === 'dark' ? (
               <>
@@ -206,7 +206,7 @@ const AdminPage = () => {
             variant="destructive"
             size="sm"
             onClick={handleLogout}
-            className="w-full"
+            className="w-full bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 shadow-lg"
           >
             <LogOut className="h-4 w-4 mr-2" />
             Logout
@@ -216,20 +216,11 @@ const AdminPage = () => {
 
       {/* Main Content */}
       <main className="flex-1 lg:ml-64 min-h-screen">
-        <div className="sticky top-0 z-30 bg-background/95 backdrop-blur-lg border-b px-6 py-4 flex items-center justify-between animate-fade-in">
+        <div className="sticky top-0 z-30 bg-gradient-to-r from-orange-50/95 via-amber-50/95 to-yellow-50/95 dark:from-gray-800/95 dark:via-gray-900/95 dark:to-black/95 backdrop-blur-lg border-b border-orange-200/50 dark:border-gray-700/50 px-6 py-4 flex items-center justify-between animate-fade-in">
           <h1 className="text-2xl font-bold">
             {sidebarItems.find(item => item.id === activeTab)?.label || 'Dashboard'}
           </h1>
-          <div className="flex gap-3">
-            <Button variant="outline" size="sm" className="animate-fade-in animation-delay-150">
-              <Download className="h-4 w-4 mr-2" />
-              Export
-            </Button>
-            <Button size="sm" className="animate-fade-in animation-delay-300">
-              <Plus className="h-4 w-4 mr-2" />
-              Add New
-            </Button>
-          </div>
+          
         </div>
 
         <div className="p-6" key={animationKey}>

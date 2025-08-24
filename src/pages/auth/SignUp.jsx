@@ -137,7 +137,7 @@ const SignUp = () => {
         <div className="w-full max-w-md">
           <div className="text-center mb-8 animate-fade-in">
             <PageTitle subtitle="Create an account to showcase your creative work">
-              Join Artova
+              Join Chicora
             </PageTitle>
           </div>
 

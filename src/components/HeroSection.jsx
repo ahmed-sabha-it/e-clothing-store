@@ -105,13 +105,13 @@ const HeroSection = () => {
       {/* Arrows */}
       <button
         onClick={prevSlide}
-        className="absolute left-4 top-1/2 -translate-y-1/2 w-10 h-10 bg-black/50 hover:bg-black/70 text-white rounded-full flex items-center justify-center"
+        className="absolute left-4 top-1/2 -translate-y-1/2 w-10 h-10 bg-orange-500/80 hover:bg-orange-600/90 text-white rounded-full flex items-center justify-center backdrop-blur-sm"
       >
         <ChevronLeft className="w-5 h-5" />
       </button>
       <button
         onClick={nextSlide}
-        className="absolute right-4 top-1/2 -translate-y-1/2 w-10 h-10 bg-black/50 hover:bg-black/70 text-white rounded-full flex items-center justify-center"
+        className="absolute right-4 top-1/2 -translate-y-1/2 w-10 h-10 bg-orange-500/80 hover:bg-orange-600/90 text-white rounded-full flex items-center justify-center backdrop-blur-sm"
       >
         <ChevronRight className="w-5 h-5" />
       </button>
@@ -134,7 +134,7 @@ const HeroSection = () => {
       {/* Play/Pause Button */}
       <button
         onClick={toggleAutoplay}
-        className="absolute top-4 right-4 w-10 h-10 bg-black/50 hover:bg-black/70 text-white rounded-full flex items-center justify-center"
+        className="absolute top-4 right-4 w-10 h-10 bg-orange-500/80 hover:bg-orange-600/90 text-white rounded-full flex items-center justify-center backdrop-blur-sm"
       >
         {isAutoPlaying ? <Pause className="w-5 h-5" /> : <Play className="w-5 h-5" />}
       </button>

@@ -81,7 +81,7 @@ const ProductCard = ({ product, onQuickAdd }: ProductCardProps) => {
           {/* Wishlist Button */}
           <button
             onClick={handleWishlistToggle}
-            className="absolute top-3 right-3 p-2 rounded-full bg-white/80 dark:bg-black/80 backdrop-blur-sm hover:bg-white dark:hover:bg-black transition-colors duration-200"
+            className="absolute top-3 right-3 p-2 rounded-full bg-white/80 dark:bg-orange-500/80 backdrop-blur-sm hover:bg-white dark:hover:bg-orange-600/90 transition-colors duration-200"
           >
             <Heart
               className={`h-4 w-4 ${

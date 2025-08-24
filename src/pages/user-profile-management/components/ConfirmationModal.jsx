@@ -26,7 +26,7 @@ const ConfirmationModal = ({
 
   return (
     <div 
-      className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4 animate-fade-in"
+      className="fixed inset-0 bg-orange-500/20 backdrop-blur-sm z-50 flex items-center justify-center p-4 animate-fade-in"
       onClick={handleBackdropClick}
     >
       <div className="bg-gradient-to-br from-orange-50 via-amber-50 to-yellow-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-700 border border-border rounded-lg shadow-xl max-w-md w-full animate-fade-in animation-delay-150">

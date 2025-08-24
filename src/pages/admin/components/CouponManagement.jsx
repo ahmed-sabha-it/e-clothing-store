@@ -248,9 +248,9 @@ const CouponManagement = () => {
   };
 
   const getStatusBadge = (coupon) => {
-    if (isExpired(coupon)) return 'admin-badge error';
-    if (!coupon.is_active) return 'admin-badge warning';
-    return 'admin-badge success';
+    if (isExpired(coupon)) return 'inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400';
+    if (!coupon.is_active) return 'inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400';
+    return 'inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400';
   };
 
   const getStatusText = (coupon) => {
@@ -261,16 +261,16 @@ const CouponManagement = () => {
 
   if (loading) {
     return (
-      <div className="admin-loading">
-        <div className="admin-spinner"></div>
+      <div className="flex items-center justify-center py-12">
+        <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
       </div>
     );
   }
 
   return (
-    <div className="coupon-management">
+    <div className="space-y-6">
       {/* Search and Filters */}
-      <div className="admin-search-bar animate-fade-in">
+      <div className="flex flex-col sm:flex-row gap-3 mb-6 animate-fade-in">
         <div className="relative flex-1">
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <Input
@@ -294,12 +294,12 @@ const CouponManagement = () => {
         </Select>
         <Dialog open={isAddModalOpen} onOpenChange={setIsAddModalOpen}>
           <DialogTrigger asChild>
-            <Button>
+            <Button className="bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-white shadow-lg">
               <Plus className="h-4 w-4 mr-2" />
               Add Coupon
             </Button>
           </DialogTrigger>
-          <DialogContent className="max-w-2xl">
+          <DialogContent className="max-w-2xl dark:bg-gray-800">
             <DialogHeader>
               <DialogTitle>Create New Coupon</DialogTitle>
               <DialogDescription>
@@ -322,10 +322,10 @@ const CouponManagement = () => {
 
       {/* Coupons Grid */}
       {filteredCoupons.length === 0 ? (
-        <div className="admin-empty-state animate-fade-in animation-delay-150">
-          <Tag className="admin-empty-icon" />
-          <h3 className="admin-empty-title">No coupons found</h3>
-          <p className="admin-empty-description">
+        <div className="py-12 text-center animate-fade-in animation-delay-150">
+          <Tag className="w-16 h-16 mx-auto mb-4 text-muted-foreground" />
+          <h3 className="text-lg font-semibold mb-2">No coupons found</h3>
+          <p className="text-muted-foreground mb-6">
             {searchTerm || statusFilter !== 'all' 
               ? "Try adjusting your filters" 
               : "Start by creating your first coupon"}
@@ -336,7 +336,7 @@ const CouponManagement = () => {
           {filteredCoupons.map((coupon, index) => (
             <Card 
               key={coupon.id} 
-              className="p-6 hover:shadow-lg transition-all duration-300 animate-fade-in"
+              className="p-6 hover:shadow-lg  transition-all duration-300 animate-fade-in"
               style={{ animationDelay: `${150 + index * 100}ms` }}
             >
               <div className="flex items-start justify-between mb-4">
@@ -405,7 +405,7 @@ const CouponManagement = () => {
                 <Button
                   variant="outline"
                   size="sm"
-                  className="flex-1"
+                  className="flex-1 border-orange-200 dark:border-gray-700 hover:bg-orange-100/50 dark:hover:bg-gray-800/50"
                   onClick={() => openEditModal(coupon)}
                 >
                   <Edit className="h-4 w-4 mr-1" />
@@ -480,9 +480,9 @@ const CouponForm = ({
   isEdit = false
 }) => {
   return (
-    <div className="admin-form">
+    <div className="space-y-6">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div className="admin-form-group">
+        <div className="space-y-2">
           <Label htmlFor="code">Coupon Code</Label>
           <div className="flex gap-2">
             <Input
@@ -505,7 +505,7 @@ const CouponForm = ({
             )}
           </div>
         </div>
-        <div className="admin-form-group">
+        <div className="space-y-2">
           <Label htmlFor="discount_type">Discount Type</Label>
           <Select 
             value={formData.discount_type} 
@@ -522,9 +522,10 @@ const CouponForm = ({
         </div>
       </div>
 
-      <div className="admin-form-group">
+      <div className="space-y-2">
         <Label htmlFor="description">Description</Label>
         <Textarea
+        className="dark:bg-gray-900"
           id="description"
           name="description"
           value={formData.description}
@@ -535,7 +536,7 @@ const CouponForm = ({
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <div className="admin-form-group">
+        <div className="space-y-2">
           <Label htmlFor="discount_value">
             Discount Value {formData.discount_type === 'percentage' ? '(%)' : '($)'}
           </Label>
@@ -550,7 +551,7 @@ const CouponForm = ({
             required
           />
         </div>
-        <div className="admin-form-group">
+        <div className="space-y-2">
           <Label htmlFor="minimum_purchase">Min. Purchase ($)</Label>
           <Input
             id="minimum_purchase"
@@ -562,7 +563,7 @@ const CouponForm = ({
             placeholder="50.00"
           />
         </div>
-        <div className="admin-form-group">
+        <div className="space-y-2">
           <Label htmlFor="max_uses">Max Uses</Label>
           <Input
             id="max_uses"
@@ -576,7 +577,7 @@ const CouponForm = ({
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div className="admin-form-group">
+        <div className="space-y-2">
           <Label htmlFor="valid_from">Valid From</Label>
           <Input
             id="valid_from"
@@ -586,7 +587,7 @@ const CouponForm = ({
             onChange={handleInputChange}
           />
         </div>
-        <div className="admin-form-group">
+        <div className="space-y-2">
           <Label htmlFor="valid_until">Valid Until</Label>
           <Input
             id="valid_until"
@@ -613,10 +614,10 @@ const CouponForm = ({
       </div>
 
       <div className="flex gap-3 justify-end">
-        <Button variant="outline" onClick={onCancel}>
+        <Button variant="outline" onClick={onCancel} className="border-orange-200 dark:border-gray-700 hover:bg-orange-100/50 dark:hover:bg-gray-800/50">
           Cancel
         </Button>
-        <Button onClick={onSubmit}>
+        <Button onClick={onSubmit} className="bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-white shadow-lg">
           {isEdit ? 'Update Coupon' : 'Create Coupon'}
         </Button>
       </div>

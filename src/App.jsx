@@ -48,39 +48,45 @@ const App = () => (
             <Sonner />
             <ToastContainer />
             <BrowserRouter>
-              <div className="min-h-screen flex flex-col bg-gradient-to-br from-orange-50 via-amber-50 to-yellow-50 dark:from-gray-800 dark:via-gray-900 dark:to-black">
-                <Header />
-                <main className="flex-1">
-                  <Routes>
-                    <Route path="/" element={<Index />} />
-                    <Route path="/category/:category" element={<CategoryPage />} />
-                    <Route path="/product/:id" element={<ProductPage />} />
-                    <Route path="/cart" element={<CartPage />} />
-                    <Route path="/checkout" element={<CheckoutPage />} />
-                    <Route path="/wishlist" element={<WishlistPage />} />
-                    <Route path="/search" element={<SearchPage />} />
-                    {/* Static Pages */}
-                    <Route path="/about" element={<About />} />
-                    <Route path="/contact" element={<Contact />} />
-                    <Route path="/features" element={<Features />} />
-                    <Route path="/privacy" element={<Privacy />} />
-                    <Route path="/terms" element={<Terms />} />
-                    <Route path="/cookies" element={<Cookies />} />
-                    {/* Auth Pages */}
-                    <Route path="/signin" element={<SignIn />} />
-                    <Route path="/signup" element={<SignUp />} />
-                    <Route path="/forgot-password" element={<ForgotPassword />} />
-                    <Route path="/reset-password" element={<ResetPassword />} />
-                    <Route path="/change-password" element={<ChangePassword />} />
-                    {/* Profile Page */}
-                    <Route path="/profile" element={<UserProfileManagement />} />
-                    {/* Admin Page */}
-                    <Route path="/admin" element={<AdminPage />} />
-                    <Route path="*" element={<NotFound />} />
-                  </Routes>
-                </main>
-                <Footer />
-              </div>
+              <Routes>
+                {/* Admin Page - Full Layout */}
+                <Route path="/admin" element={<AdminPage />} />
+                
+                {/* Regular Pages with Header/Footer */}
+                <Route path="/*" element={
+                  <div className="min-h-screen flex flex-col bg-gradient-to-br from-orange-50 via-amber-50 to-yellow-50 dark:from-gray-800 dark:via-gray-900 dark:to-black">
+                    <Header />
+                    <main className="flex-1">
+                      <Routes>
+                        <Route path="/" element={<Index />} />
+                        <Route path="/category/:category" element={<CategoryPage />} />
+                        <Route path="/product/:id" element={<ProductPage />} />
+                        <Route path="/cart" element={<CartPage />} />
+                        <Route path="/checkout" element={<CheckoutPage />} />
+                        <Route path="/wishlist" element={<WishlistPage />} />
+                        <Route path="/search" element={<SearchPage />} />
+                        {/* Static Pages */}
+                        <Route path="/about" element={<About />} />
+                        <Route path="/contact" element={<Contact />} />
+                        <Route path="/features" element={<Features />} />
+                        <Route path="/privacy" element={<Privacy />} />
+                        <Route path="/terms" element={<Terms />} />
+                        <Route path="/cookies" element={<Cookies />} />
+                        {/* Auth Pages */}
+                        <Route path="/signin" element={<SignIn />} />
+                        <Route path="/signup" element={<SignUp />} />
+                        <Route path="/forgot-password" element={<ForgotPassword />} />
+                        <Route path="/reset-password" element={<ResetPassword />} />
+                        <Route path="/change-password" element={<ChangePassword />} />
+                        {/* Profile Page */}
+                        <Route path="/profile" element={<UserProfileManagement />} />
+                        <Route path="*" element={<NotFound />} />
+                      </Routes>
+                    </main>
+                    <Footer />
+                  </div>
+                } />
+              </Routes>
             </BrowserRouter>
             </WishlistProvider>
           </CartProvider>

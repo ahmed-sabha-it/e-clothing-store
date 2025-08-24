@@ -74,11 +74,11 @@ const Dashboard = ({ stats }) => {
   return (
     <div className="dashboard-container">
       {/* Stats Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+      <div className="grid grid-cols-1 sm:grid-cols-2  lg:grid-cols-3 gap-4 mb-8">
         {stats.map((stat, index) => (
           <Card 
             key={stat.label} 
-            className="p-6 rounded-xl border bg-card hover:shadow-lg transition-all duration-300 hover:-translate-y-1 animate-fade-in"
+            className="p-6 rounded-xl border bg-card  dark:bg-gray-800 hover:shadow-lg transition-all duration-300 hover:-translate-y-1 animate-fade-in"
             style={{ animationDelay: `${index * 100}ms` }}
           >
             <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center mb-4">
@@ -97,9 +97,9 @@ const Dashboard = ({ stats }) => {
       </div>
 
       {/* Charts Row */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+      <div className="grid grid-cols-1 lg:grid-cols-2   gap-6 mb-6">
         {/* Sales Chart */}
-        <Card className="p-6 animate-fade-in animation-delay-300">
+        {/* <Card className="p-6 animate-fade-in dark:bg-gray-800 animation-delay-300">
           <h3 className="text-lg font-semibold mb-4">Sales Overview</h3>
           <ResponsiveContainer width="100%" height={300}>
             <LineChart data={salesData}>
@@ -116,11 +116,11 @@ const Dashboard = ({ stats }) => {
               />
             </LineChart>
           </ResponsiveContainer>
-        </Card>
+        </Card> */}
 
         {/* Category Distribution */}
-        <Card className="p-6 animate-fade-in animation-delay-450">
-          <h3 className="text-lg font-semibold mb-4">Sales by Category</h3>
+        <Card className="p-6 animate-fade-in col-span-2 dark:bg-gray-800 animation-delay-450">
+          <h3 className="text-lg font-semibold   mb-4">Sales by Category</h3>
           <ResponsiveContainer width="100%" height={300}>
             <PieChart>
               <Pie
@@ -144,7 +144,7 @@ const Dashboard = ({ stats }) => {
       </div>
 
       {/* Recent Orders Table */}
-      <Card className="bg-card rounded-xl border overflow-hidden animate-fade-in animation-delay-600">
+      <Card className="bg-card rounded-xl border dark:bg-gray-800 overflow-hidden animate-fade-in animation-delay-600">
         <div className="p-6 border-b flex items-center justify-between">
           <h3 className="text-lg font-semibold">Recent Orders</h3>
           <button className="text-primary hover:underline text-sm">View All</button>

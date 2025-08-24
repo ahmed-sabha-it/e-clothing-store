@@ -340,7 +340,7 @@ const ProductManagement = () => {
           />
         </div>
         <Select value={selectedCategory} onValueChange={setSelectedCategory}>
-          <SelectTrigger className=" w-[180px]">
+          <SelectTrigger className="w-[180px]">
             <SelectValue placeholder="All Categories" />
           </SelectTrigger>
           <SelectContent>
@@ -357,15 +357,14 @@ const ProductManagement = () => {
               Add Product
             </Button>
           </DialogTrigger>
-          <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto dark:bg-gray-800">
+          <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
             <DialogHeader>
               <DialogTitle>Add New Product</DialogTitle>
-              <DialogDescription className="dark:bg-gray-900" >
+              <DialogDescription>
                 Fill in the product details below
               </DialogDescription>
             </DialogHeader>
             <ProductForm
-            
               formData={formData}
               imagePreview={imagePreview}
               categories={categories}
@@ -401,7 +400,7 @@ const ProductManagement = () => {
           {filteredProducts.map((product, index) => (
             <Card 
               key={product.id} 
-              className="overflow-hidden dark:bg-gray-900 hover:shadow-lg transition-all duration-300 animate-fade-in"
+              className="overflow-hidden hover:shadow-lg transition-all duration-300 animate-fade-in"
               style={{ animationDelay: `${150 + index * 100}ms` }}
             >
               <div className="aspect-square relative overflow-hidden bg-gray-100">
@@ -456,7 +455,7 @@ const ProductManagement = () => {
                   <Button
                     variant="destructive"
                     size="sm"
-                    className="flex-1 "
+                    className="flex-1"
                     onClick={() => setDeleteProductId(product.id)}
                   >
                     <Trash2 className="h-4 w-4 mr-1" />
@@ -471,7 +470,7 @@ const ProductManagement = () => {
 
       {/* Edit Product Dialog */}
       <Dialog open={isEditModalOpen} onOpenChange={setIsEditModalOpen}>
-        <DialogContent className="max-w-3xl dark:bg-gray-800 max-h-[90vh] overflow-y-auto">
+        <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>Edit Product</DialogTitle>
             <DialogDescription>
@@ -570,7 +569,6 @@ const ProductForm = ({
       <div className="space-y-2">
         <Label htmlFor="description">Description</Label>
         <Textarea
-        className="dark:bg-gray-900"
           id="description"
           name="description"
           value={formData.description}
@@ -622,7 +620,7 @@ const ProductForm = ({
 
       <div className="space-y-2">
         <Label>Available Sizes</Label>
-        <div className="flex flex-wrap  gap-2 mt-2">
+        <div className="flex flex-wrap gap-2 mt-2">
           {sizes.map(size => (
             <button
               key={size}
@@ -648,7 +646,7 @@ const ProductForm = ({
               key={color}
               type="button"
               onClick={() => handleColorToggle(color)}
-              className={`px-3 py-1  rounded-md border transition-colors ${
+              className={`px-3 py-1 rounded-md border transition-colors ${
                 formData.colors.includes(color)
                   ? 'bg-primary text-primary-foreground border-primary'
                   : 'bg-background hover:bg-accent'

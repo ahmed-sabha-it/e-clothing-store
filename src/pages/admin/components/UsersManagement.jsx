@@ -95,15 +95,15 @@ const UsersManagement = () => {
           id: 1,
           name: 'John Doe',
           email: 'john.doe@example.com',
-          phone: '+1 234 567 8900',
+          phone: '+963 996-944-873',
           role: 'customer',
-          status: 'active',
-          balance: 250.50,
+          // status: 'active',
+          balance: 250.00,
           total_orders: 15,
           total_spent: 1250.00,
           joined_date: '2023-06-15',
           last_login: '2024-01-15',
-          address: '123 Main St, New York, NY 10001'
+          address: 'banias-Syria'
         },
         {
           id: 2,
@@ -111,7 +111,7 @@ const UsersManagement = () => {
           email: 'jane.smith@example.com',
           phone: '+1 234 567 8901',
           role: 'admin',
-          status: 'active',
+          // status: 'active',
           balance: 0,
           total_orders: 0,
           total_spent: 0,
@@ -125,7 +125,7 @@ const UsersManagement = () => {
           email: 'bob.johnson@example.com',
           phone: '+1 234 567 8902',
           role: 'customer',
-          status: 'inactive',
+          // status: 'inactive',
           balance: 50.00,
           total_orders: 8,
           total_spent: 650.00,
@@ -139,7 +139,7 @@ const UsersManagement = () => {
           email: 'alice.brown@example.com',
           phone: '+1 234 567 8903',
           role: 'customer',
-          status: 'active',
+          // status: 'active',
           balance: 125.75,
           total_orders: 22,
           total_spent: 2150.00,
@@ -147,20 +147,20 @@ const UsersManagement = () => {
           last_login: '2024-01-14',
           address: '321 Elm St, Houston, TX 77001'
         },
-        {
-          id: 5,
-          name: 'Charlie Wilson',
-          email: 'charlie.wilson@example.com',
-          phone: '+1 234 567 8904',
-          role: 'customer',
-          status: 'suspended',
-          balance: 0,
-          total_orders: 3,
-          total_spent: 150.00,
-          joined_date: '2023-11-10',
-          last_login: '2023-12-20',
-          address: '654 Maple Dr, Phoenix, AZ 85001'
-        }
+        // {
+        //   id: 5,
+        //   name: 'Charlie Wilson',
+        //   email: 'charlie.wilson@example.com',
+        //   phone: '+1 234 567 8904',
+        //   role: 'customer',
+        //   status: 'suspended',
+        //   balance: 0,
+        //   total_orders: 3,
+        //   total_spent: 150.00,
+        //   joined_date: '2023-11-10',
+        //   last_login: '2023-12-20',
+        //   address: '654 Maple Dr, Phoenix, AZ 85001'
+        // }
       ];
       setUsers(mockUsers);
       setFilteredUsers(mockUsers);
@@ -213,11 +213,9 @@ const UsersManagement = () => {
   const handleEditUser = (user) => {
     setSelectedUser(user);
     setEditFormData({
-      name: user.name,
-      email: user.email,
-      phone: user.phone,
+      
       role: user.role,
-      status: user.status,
+      // status: user.status,
       balance: user.balance
     });
     setIsEditModalOpen(true);
@@ -288,9 +286,7 @@ const UsersManagement = () => {
 
   const resetEditForm = () => {
     setEditFormData({
-      name: '',
-      email: '',
-      phone: '',
+     
       role: 'customer',
       status: 'active',
       balance: 0
@@ -300,33 +296,33 @@ const UsersManagement = () => {
 
   const getStatusBadge = (status) => {
     const statusStyles = {
-      active: 'admin-badge success',
-      inactive: 'admin-badge warning',
-      suspended: 'admin-badge error',
+      active: 'inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400',
+      inactive: 'inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400',
+      suspended: 'inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400',
     };
-    return statusStyles[status] || 'admin-badge';
+    return statusStyles[status] || 'inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800 dark:bg-gray-900/30 dark:text-gray-400';
   };
 
   const getRoleBadge = (role) => {
     const roleStyles = {
-      admin: 'admin-badge info',
-      customer: 'admin-badge',
+      admin: 'inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400',
+      customer: 'inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800 dark:bg-gray-900/30 dark:text-gray-400',
     };
-    return roleStyles[role] || 'admin-badge';
+    return roleStyles[role] || 'inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800 dark:bg-gray-900/30 dark:text-gray-400';
   };
 
   if (loading) {
     return (
-      <div className="admin-loading">
-        <div className="admin-spinner"></div>
+      <div className="flex items-center justify-center py-12">
+        <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
       </div>
     );
   }
 
   return (
-    <div className="users-management">
+    <div className="space-y-6">
       {/* Search and Filters */}
-      <div className="admin-search-bar animate-fade-in">
+      <div className="flex flex-col sm:flex-row gap-3 mb-6 animate-fade-in">
         <div className="relative flex-1">
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <Input
@@ -362,29 +358,29 @@ const UsersManagement = () => {
 
       {/* Users Table */}
       {filteredUsers.length === 0 ? (
-        <div className="admin-empty-state animate-fade-in animation-delay-150">
-          <User className="admin-empty-icon" />
-          <h3 className="admin-empty-title">No users found</h3>
-          <p className="admin-empty-description">
+        <div className="py-12 text-center  animate-fade-in animation-delay-150">
+          <User className="w-16 h-16 mx-auto mb-4 text-muted-foreground" />
+          <h3 className="text-lg font-semibold mb-2">No users found</h3>
+          <p className="text-muted-foreground mb-6">
             {searchTerm || roleFilter !== 'all' || statusFilter !== 'all'
               ? "Try adjusting your filters" 
               : "No users registered yet"}
           </p>
         </div>
       ) : (
-        <Card className="admin-table-container animate-fade-in animation-delay-150">
+        <Card className="bg-card rounded-xl border overflow-hidden animate-fade-in animation-delay-150">
           <div className="overflow-x-auto">
-            <table className="admin-table">
+            <table className="w-full">
               <thead>
-                <tr>
-                  <th>User</th>
-                  <th>Contact</th>
-                  <th>Role</th>
-                  <th>Status</th>
-                  <th>Orders</th>
-                  <th>Balance</th>
-                  <th>Joined</th>
-                  <th>Actions</th>
+                <tr className="bg-muted/50">
+                  <th className="px-6 py-4 dark:bg-gray-800 text-left text-sm font-medium text-muted-foreground">User</th>
+                  <th className="px-6 py-4 text-left dark:bg-gray-800 text-sm font-medium text-muted-foreground">Contact</th>
+                  <th className="px-6 py-4 text-left dark:bg-gray-800 text-sm font-medium text-muted-foreground">Role</th>
+                  {/* <th className="px-6 py-4 text-left dark:bg-gray-800 text-sm font-medium text-muted-foreground">Status</th> */}
+                  <th className="px-6 py-4 text-left dark:bg-gray-800 text-sm font-medium text-muted-foreground">Orders</th>
+                  <th className="px-6 py-4 text-left dark:bg-gray-800 text-sm font-medium text-muted-foreground">Balance</th>
+                  <th className="px-6 py-4 text-left dark:bg-gray-800 text-sm font-medium text-muted-foreground">Joined</th>
+                  <th className="px-6 py-4 text-left dark:bg-gray-800 text-sm font-medium text-muted-foreground">Actions</th>
                 </tr>
               </thead>
               <tbody>
@@ -394,7 +390,7 @@ const UsersManagement = () => {
                     className="animate-fade-in"
                     style={{ animationDelay: `${300 + index * 100}ms` }}
                   >
-                    <td>
+                    <td className="px-6 bg-gray-900 py-4">
                       <div className="flex items-center gap-3">
                         <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
                           <User className="h-5 w-5 text-primary" />
@@ -405,35 +401,35 @@ const UsersManagement = () => {
                         </div>
                       </div>
                     </td>
-                    <td>
+                    <td className="px-6 bg-gray-900 py-4">
                       <div className="space-y-1">
                         <div className="text-sm">{user.email}</div>
                         <div className="text-sm text-muted-foreground">{user.phone}</div>
                       </div>
                     </td>
-                    <td>
+                    <td className="px-6 bg-gray-900 py-4">
                       <span className={getRoleBadge(user.role)}>
                         {user.role}
                       </span>
                     </td>
-                    <td>
+                    {/* <td className="px-6 bg-gray-900 py-4">
                       <span className={getStatusBadge(user.status)}>
                         {user.status}
                       </span>
-                    </td>
-                    <td>
+                    </td> */}
+                    <td className="px-6 bg-gray-900 py-4">
                       <div className="space-y-1">
                         <div className="text-sm font-semibold">{user.total_orders} orders</div>
                         <div className="text-sm text-muted-foreground">${user.total_spent}</div>
                       </div>
                     </td>
-                    <td className="font-semibold">
+                    <td className="px-6 py-4 bg-gray-900 font-semibold">
                       ${user.balance.toFixed(2)}
                     </td>
-                    <td className="text-sm text-muted-foreground">
+                    <td className="px-6 py-4 text-sm bg-gray-900 text-muted-foreground">
                       {new Date(user.joined_date).toLocaleDateString()}
                     </td>
-                    <td>
+                    <td className="px-6  bg-gray-900 py-4">
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
                           <Button variant="ghost" size="icon">
@@ -490,7 +486,7 @@ const UsersManagement = () => {
 
       {/* View User Dialog */}
       <Dialog open={isViewModalOpen} onOpenChange={setIsViewModalOpen}>
-        <DialogContent className="max-w-2xl">
+        <DialogContent className="max-w-2xl dark:bg-gray-800 ">
           <DialogHeader>
             <DialogTitle>User Details</DialogTitle>
             <DialogDescription>
@@ -545,21 +541,21 @@ const UsersManagement = () => {
               </div>
 
               <div className="grid grid-cols-3 gap-4">
-                <Card className="p-4">
+                <Card className="p-4 dark:bg-gray-900">
                   <div className="flex items-center gap-2 mb-2">
                     <ShoppingBag className="h-5 w-5 text-primary" />
                     <span className="text-sm text-muted-foreground">Total Orders</span>
                   </div>
                   <p className="text-2xl font-bold">{selectedUser.total_orders}</p>
                 </Card>
-                <Card className="p-4">
+                <Card className="p-4 dark:bg-gray-900">
                   <div className="flex items-center gap-2 mb-2">
                     <DollarSign className="h-5 w-5 text-primary" />
                     <span className="text-sm text-muted-foreground">Total Spent</span>
                   </div>
                   <p className="text-2xl font-bold">${selectedUser.total_spent}</p>
                 </Card>
-                <Card className="p-4">
+                <Card className="p-4 dark:bg-gray-900">
                   <div className="flex items-center gap-2 mb-2">
                     <DollarSign className="h-5 w-5 text-primary" />
                     <span className="text-sm text-muted-foreground">Balance</span>
@@ -573,16 +569,16 @@ const UsersManagement = () => {
       </Dialog>
 
       {/* Edit User Dialog */}
-      <Dialog open={isEditModalOpen} onOpenChange={setIsEditModalOpen}>
-        <DialogContent>
+      <Dialog    open={isEditModalOpen} onOpenChange={setIsEditModalOpen}>
+        <DialogContent className="dark:bg-gray-900">
           <DialogHeader>
             <DialogTitle>Edit User</DialogTitle>
             <DialogDescription>
               Update user information
             </DialogDescription>
           </DialogHeader>
-          <div className="admin-form">
-            <div className="admin-form-group">
+          <div className="space-y-6">
+            {/* <div className="space-y-2">
               <Label htmlFor="edit-name">Name</Label>
               <Input
                 id="edit-name"
@@ -591,7 +587,7 @@ const UsersManagement = () => {
                 onChange={handleEditInputChange}
               />
             </div>
-            <div className="admin-form-group">
+            <div className="space-y-2">
               <Label htmlFor="edit-email">Email</Label>
               <Input
                 id="edit-email"
@@ -601,7 +597,7 @@ const UsersManagement = () => {
                 onChange={handleEditInputChange}
               />
             </div>
-            <div className="admin-form-group">
+            <div className="space-y-2">
               <Label htmlFor="edit-phone">Phone</Label>
               <Input
                 id="edit-phone"
@@ -609,9 +605,9 @@ const UsersManagement = () => {
                 value={editFormData.phone}
                 onChange={handleEditInputChange}
               />
-            </div>
+            </div> */}
             <div className="grid grid-cols-2 gap-4">
-              <div className="admin-form-group">
+              <div className="space-y-2">
                 <Label htmlFor="edit-role">Role</Label>
                 <Select 
                   value={editFormData.role} 
@@ -626,7 +622,7 @@ const UsersManagement = () => {
                   </SelectContent>
                 </Select>
               </div>
-              <div className="admin-form-group">
+              {/* <div className="space-y-2">
                 <Label htmlFor="edit-status">Status</Label>
                 <Select 
                   value={editFormData.status} 
@@ -641,9 +637,9 @@ const UsersManagement = () => {
                     <SelectItem value="suspended">Suspended</SelectItem>
                   </SelectContent>
                 </Select>
-              </div>
+              </div> */}
             </div>
-            <div className="admin-form-group">
+            <div className="space-y-2">
               <Label htmlFor="edit-balance">Balance</Label>
               <Input
                 id="edit-balance"
@@ -661,10 +657,11 @@ const UsersManagement = () => {
                   setIsEditModalOpen(false);
                   resetEditForm();
                 }}
+                className="border-orange-200 dark:border-gray-700 hover:bg-orange-100/50 dark:hover:bg-gray-800/50"
               >
                 Cancel
               </Button>
-              <Button onClick={handleUpdateUser}>
+              <Button onClick={handleUpdateUser} className="bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-white shadow-lg">
                 Update User
               </Button>
             </div>
