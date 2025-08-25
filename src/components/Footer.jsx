@@ -2,8 +2,15 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import Icon from '@/components/AppIcon';
 import Logo from '@/components/Logo';
+import { useAuth } from '@/contexts/AuthContext';
 
 const Footer = () => {
+  const { isAuthenticated, user } = useAuth();
+
+  // Don't render footer for admin users
+  if (isAuthenticated && (user?.is_admin || user?.role === 'admin')) {
+    return null;
+  }
   const footerSections = [
 
   

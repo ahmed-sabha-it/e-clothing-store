@@ -8,6 +8,8 @@ interface User {
   profile_picture?: string;
   avatar?: string;
   balance?: number;
+  role?: string;
+  is_admin?: boolean;
 }
 
 interface AuthContextType {

@@ -11,7 +11,7 @@ const Header = () => {
   const { isDark, toggleTheme } = useTheme();
   const { getTotalItems } = useCart();
   const { wishlistItems } = useWishlist();
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, user } = useAuth();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const location = useLocation();
@@ -35,6 +35,12 @@ const Header = () => {
       navigate('/search');
     }
   };
+
+  // Don't render header for admin users
+  if (isAuthenticated && (user?.is_admin || user?.role === 'admin')) {
+    return null;
+  }
+
   return (
     <header className="bg-gradient-to-br from-orange-50 via-amber-50 to-yellow-50 dark:from-gray-800 dark:via-gray-900 dark:to-black border-b border-border sticky top-0 z-50">
       <div className="w-full px-4 sm:px-6 lg:px-8">

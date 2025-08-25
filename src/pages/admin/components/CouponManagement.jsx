@@ -42,9 +42,11 @@ import {
   XCircle
 } from 'lucide-react';
 import { couponAPI } from '@/lib/api';
+import { useAuth } from '@/contexts/AuthContext';
 import { toast } from '@/hooks/use-toast';
 
 const CouponManagement = () => {
+  const { token } = useAuth();
   const [coupons, setCoupons] = useState([]);
   const [filteredCoupons, setFilteredCoupons] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -54,17 +56,18 @@ const CouponManagement = () => {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [deleteCouponId, setDeleteCouponId] = useState(null);
   const [selectedCoupon, setSelectedCoupon] = useState(null);
+  const [formErrors, setFormErrors] = useState({});
   
   const [formData, setFormData] = useState({
     code: '',
     description: '',
     discount_type: 'percentage',
     discount_value: '',
-    minimum_purchase: '',
+    min_purchase: '',
     max_uses: '',
     used_count: 0,
     valid_from: '',
-    valid_until: '',
+    expires_at: '',
     is_active: true
   });
 
@@ -80,12 +83,14 @@ const CouponManagement = () => {
     try {
       setLoading(true);
       const response = await couponAPI.getAll();
-      setCoupons(response.data);
-      setFilteredCoupons(response.data);
+      setCoupons(response.data || []);
+      setFilteredCoupons(response.data || []);
     } catch (error) {
+      console.error('Failed to fetch coupons:', error);
+      const errorMessage = error.response?.data?.message || 'Failed to fetch coupons';
       toast({
         title: "Error",
-        description: "Failed to fetch coupons",
+        description: errorMessage,
         variant: "destructive",
       });
     } finally {
@@ -116,8 +121,8 @@ const CouponManagement = () => {
   };
 
   const isExpired = (coupon) => {
-    if (!coupon.valid_until) return false;
-    return new Date(coupon.valid_until) < new Date();
+    if (!coupon.expires_at) return false;
+    return new Date(coupon.expires_at) < new Date();
   };
 
   const handleInputChange = (e) => {
@@ -141,9 +146,66 @@ const CouponManagement = () => {
     });
   };
 
+  const validateForm = () => {
+    const errors = {};
+    
+    if (!formData.code || formData.code.length < 3) {
+      errors.code = 'Coupon code is required and must be at least 3 characters';
+    }
+    
+    if (!formData.discount_value || isNaN(formData.discount_value) || parseFloat(formData.discount_value) <= 0) {
+      errors.discount_value = 'Discount value is required and must be greater than 0';
+    }
+    
+    if (formData.discount_type === 'percentage' && parseFloat(formData.discount_value) > 100) {
+      errors.discount_value = 'Percentage discount cannot exceed 100%';
+    }
+    
+    if (!formData.min_purchase || isNaN(formData.min_purchase) || parseFloat(formData.min_purchase) < 0) {
+      errors.min_purchase = 'Minimum purchase is required and must be a positive number';
+    }
+    
+    if (!formData.expires_at) {
+      errors.expires_at = 'Expiration date is required';
+    }
+    
+    if (formData.max_uses && (isNaN(formData.max_uses) || parseInt(formData.max_uses) <= 0)) {
+      errors.max_uses = 'Max uses must be a positive integer';
+    }
+    
+    if (formData.expires_at && new Date(formData.expires_at) <= new Date()) {
+      errors.expires_at = 'Expiration date must be in the future';
+    }
+    
+    setFormErrors(errors);
+    return Object.keys(errors).length === 0;
+  };
+
   const handleAddCoupon = async () => {
+    if (!validateForm()) {
+      const errorMessages = Object.values(formErrors).join('. ');
+      toast({
+        title: "Validation Error",
+        description: errorMessages || "Please fix the form errors before submitting",
+        variant: "destructive",
+      });
+      return;
+    }
+
     try {
-      await couponAPI.create(formData);
+      const couponData = {
+        code: formData.code.toUpperCase(),
+        description: formData.description || null,
+        discount_type: formData.discount_type,
+        discount_value: parseFloat(formData.discount_value),
+        min_purchase: parseFloat(formData.min_purchase),
+        max_uses: formData.max_uses ? parseInt(formData.max_uses) : null,
+        valid_from: formData.valid_from || null,
+        expires_at: formData.expires_at,
+        is_active: formData.is_active
+      };
+
+      await couponAPI.create(couponData);
       toast({
         title: "Success",
         description: "Coupon created successfully",
@@ -152,17 +214,41 @@ const CouponManagement = () => {
       resetForm();
       fetchCoupons();
     } catch (error) {
+      console.error('Failed to create coupon:', error);
+      const errorMessage = error.response?.data?.message || 'Failed to create coupon';
       toast({
         title: "Error",
-        description: "Failed to create coupon",
+        description: errorMessage,
         variant: "destructive",
       });
     }
   };
 
   const handleEditCoupon = async () => {
+    if (!validateForm()) {
+      const errorMessages = Object.values(formErrors).join('. ');
+      toast({
+        title: "Validation Error",
+        description: errorMessages || "Please fix the form errors before submitting",
+        variant: "destructive",
+      });
+      return;
+    }
+
     try {
-      await couponAPI.update(selectedCoupon.id, formData);
+      const couponData = {
+        code: formData.code.toUpperCase(),
+        description: formData.description || null,
+        discount_type: formData.discount_type,
+        discount_value: parseFloat(formData.discount_value),
+        min_purchase: parseFloat(formData.min_purchase),
+        max_uses: formData.max_uses ? parseInt(formData.max_uses) : null,
+        valid_from: formData.valid_from || null,
+        expires_at: formData.expires_at,
+        is_active: formData.is_active
+      };
+
+      await couponAPI.update(selectedCoupon.id, couponData);
       toast({
         title: "Success",
         description: "Coupon updated successfully",
@@ -171,9 +257,11 @@ const CouponManagement = () => {
       resetForm();
       fetchCoupons();
     } catch (error) {
+      console.error('Failed to update coupon:', error);
+      const errorMessage = error.response?.data?.message || 'Failed to update coupon';
       toast({
         title: "Error",
-        description: "Failed to update coupon",
+        description: errorMessage,
         variant: "destructive",
       });
     }
@@ -189,9 +277,11 @@ const CouponManagement = () => {
       setDeleteCouponId(null);
       fetchCoupons();
     } catch (error) {
+      console.error('Failed to delete coupon:', error);
+      const errorMessage = error.response?.data?.message || 'Failed to delete coupon';
       toast({
         title: "Error",
-        description: "Failed to delete coupon",
+        description: errorMessage,
         variant: "destructive",
       });
     }
@@ -206,9 +296,11 @@ const CouponManagement = () => {
       });
       fetchCoupons();
     } catch (error) {
+      console.error('Failed to update coupon status:', error);
+      const errorMessage = error.response?.data?.message || 'Failed to update coupon status';
       toast({
         title: "Error",
-        description: "Failed to update coupon status",
+        description: errorMessage,
         variant: "destructive",
       });
     }
@@ -218,14 +310,14 @@ const CouponManagement = () => {
     setSelectedCoupon(coupon);
     setFormData({
       code: coupon.code,
-      description: coupon.description,
+      description: coupon.description || '',
       discount_type: coupon.discount_type,
       discount_value: coupon.discount_value,
-      minimum_purchase: coupon.minimum_purchase,
-      max_uses: coupon.max_uses,
-      used_count: coupon.used_count,
-      valid_from: coupon.valid_from,
-      valid_until: coupon.valid_until,
+      min_purchase: coupon.min_purchase || '',
+      max_uses: coupon.max_uses || '',
+      used_count: coupon.used_count || 0,
+      valid_from: coupon.valid_from || '',
+      expires_at: coupon.expires_at || '',
       is_active: coupon.is_active
     });
     setIsEditModalOpen(true);
@@ -237,14 +329,15 @@ const CouponManagement = () => {
       description: '',
       discount_type: 'percentage',
       discount_value: '',
-      minimum_purchase: '',
+      min_purchase: '',
       max_uses: '',
       used_count: 0,
       valid_from: '',
-      valid_until: '',
+      expires_at: '',
       is_active: true
     });
     setSelectedCoupon(null);
+    setFormErrors({});
   };
 
   const getStatusBadge = (coupon) => {
@@ -315,6 +408,7 @@ const CouponManagement = () => {
                 setIsAddModalOpen(false);
                 resetForm();
               }}
+              formErrors={formErrors}
             />
           </DialogContent>
         </Dialog>
@@ -379,10 +473,10 @@ const CouponManagement = () => {
                       : `$${coupon.discount_value}`}
                   </span>
                 </div>
-                {coupon.minimum_purchase > 0 && (
+                {coupon.min_purchase > 0 && (
                   <div className="flex items-center justify-between text-sm">
                     <span className="text-muted-foreground">Min. Purchase:</span>
-                    <span className="font-semibold">${coupon.minimum_purchase}</span>
+                    <span className="font-semibold">${coupon.min_purchase}</span>
                   </div>
                 )}
                 <div className="flex items-center justify-between text-sm">
@@ -391,11 +485,11 @@ const CouponManagement = () => {
                     {coupon.used_count} / {coupon.max_uses || '∞'}
                   </span>
                 </div>
-                {coupon.valid_until && (
+                {coupon.expires_at && (
                   <div className="flex items-center justify-between text-sm">
                     <span className="text-muted-foreground">Expires:</span>
                     <span className="font-semibold">
-                      {new Date(coupon.valid_until).toLocaleDateString()}
+                      {new Date(coupon.expires_at).toLocaleDateString()}
                     </span>
                   </div>
                 )}
@@ -445,6 +539,7 @@ const CouponManagement = () => {
               resetForm();
             }}
             isEdit
+            formErrors={formErrors}
           />
         </DialogContent>
       </Dialog>
@@ -477,13 +572,14 @@ const CouponForm = ({
   generateCouponCode,
   onSubmit,
   onCancel,
-  isEdit = false
+  isEdit = false,
+  formErrors = {}
 }) => {
   return (
     <div className="space-y-6">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div className="space-y-2">
-          <Label htmlFor="code">Coupon Code</Label>
+          <Label htmlFor="code">Coupon Code *</Label>
           <div className="flex gap-2">
             <Input
               id="code"
@@ -491,7 +587,7 @@ const CouponForm = ({
               value={formData.code}
               onChange={handleInputChange}
               placeholder="SUMMER2024"
-              className="uppercase"
+              className={`uppercase ${formErrors.code ? 'border-red-500' : ''}`}
               required
             />
             {!isEdit && (
@@ -504,6 +600,9 @@ const CouponForm = ({
               </Button>
             )}
           </div>
+          {formErrors.code && (
+            <p className="text-sm text-red-500">{formErrors.code}</p>
+          )}
         </div>
         <div className="space-y-2">
           <Label htmlFor="discount_type">Discount Type</Label>
@@ -538,30 +637,42 @@ const CouponForm = ({
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <div className="space-y-2">
           <Label htmlFor="discount_value">
-            Discount Value {formData.discount_type === 'percentage' ? '(%)' : '($)'}
+            Discount Value * {formData.discount_type === 'percentage' ? '(%)' : '($)'}
           </Label>
           <Input
             id="discount_value"
             name="discount_value"
             type="number"
             step={formData.discount_type === 'percentage' ? '1' : '0.01'}
+            min="0"
+            max={formData.discount_type === 'percentage' ? '100' : undefined}
             value={formData.discount_value}
             onChange={handleInputChange}
             placeholder={formData.discount_type === 'percentage' ? '20' : '10.00'}
+            className={formErrors.discount_value ? 'border-red-500' : ''}
             required
           />
+          {formErrors.discount_value && (
+            <p className="text-sm text-red-500">{formErrors.discount_value}</p>
+          )}
         </div>
         <div className="space-y-2">
-          <Label htmlFor="minimum_purchase">Min. Purchase ($)</Label>
+          <Label htmlFor="min_purchase">Min. Purchase ($) *</Label>
           <Input
-            id="minimum_purchase"
-            name="minimum_purchase"
+            id="min_purchase"
+            name="min_purchase"
             type="number"
             step="0.01"
-            value={formData.minimum_purchase}
+            min="0"
+            value={formData.min_purchase}
             onChange={handleInputChange}
             placeholder="50.00"
+            className={formErrors.min_purchase ? 'border-red-500' : ''}
+            required
           />
+          {formErrors.min_purchase && (
+            <p className="text-sm text-red-500">{formErrors.min_purchase}</p>
+          )}
         </div>
         <div className="space-y-2">
           <Label htmlFor="max_uses">Max Uses</Label>
@@ -569,10 +680,15 @@ const CouponForm = ({
             id="max_uses"
             name="max_uses"
             type="number"
+            min="1"
             value={formData.max_uses}
             onChange={handleInputChange}
             placeholder="100"
+            className={formErrors.max_uses ? 'border-red-500' : ''}
           />
+          {formErrors.max_uses && (
+            <p className="text-sm text-red-500">{formErrors.max_uses}</p>
+          )}
         </div>
       </div>
 
@@ -588,14 +704,19 @@ const CouponForm = ({
           />
         </div>
         <div className="space-y-2">
-          <Label htmlFor="valid_until">Valid Until</Label>
+          <Label htmlFor="expires_at">Expires At *</Label>
           <Input
-            id="valid_until"
-            name="valid_until"
+            id="expires_at"
+            name="expires_at"
             type="datetime-local"
-            value={formData.valid_until}
+            value={formData.expires_at}
             onChange={handleInputChange}
+            className={formErrors.expires_at ? 'border-red-500' : ''}
+            required
           />
+          {formErrors.expires_at && (
+            <p className="text-sm text-red-500">{formErrors.expires_at}</p>
+          )}
         </div>
       </div>
 

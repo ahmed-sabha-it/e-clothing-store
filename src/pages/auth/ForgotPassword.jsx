@@ -7,7 +7,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Mail, ArrowLeft, CheckCircle } from "lucide-react";
 import { useScrollToTop } from "../../utils/scrollToTop";
 import { authAPI } from "@/lib/api";
-import { toast } from "react-toastify";
+import { toast } from "@/hooks/use-toast";
 
 const ForgotPassword = () => {
   useScrollToTop();
@@ -24,13 +24,24 @@ const ForgotPassword = () => {
       
       if (response.success) {
         setEmailSent(true);
-        toast.success('Password reset email sent!');
+        toast({
+          title: "Success",
+          description: "Password reset email sent!",
+        });
       } else {
-        toast.error(response.message || 'Failed to send reset email');
+        toast({
+          title: "Error",
+          description: response.message || 'Failed to send reset email',
+          variant: "destructive",
+        });
       }
     } catch (error) {
       console.error('Forgot password error:', error);
-      toast.error(error.response?.data?.message || 'Failed to send reset email');
+      toast({
+        title: "Error",
+        description: error.response?.data?.message || 'Failed to send reset email',
+        variant: "destructive",
+      });
     } finally {
       setLoading(false);
     }

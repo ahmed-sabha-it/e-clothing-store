@@ -26,12 +26,14 @@ import {
   DollarSign,
   TrendingUp,
   Eye,
-  X
+  X,
+  User
 } from 'lucide-react';
 import ProductManagement from './components/ProductManagement';
 import CouponManagement from './components/CouponManagement';
 import UsersManagement from './components/UsersManagement';
 import Dashboard from './components/Dashboard';
+import AccountManagement from './components/AccountManagement';
 
 const AdminPage = () => {
   const navigate = useNavigate();
@@ -41,12 +43,12 @@ const AdminPage = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [animationKey, setAnimationKey] = useState(0);
 
-  // useEffect(() => {
-  //   // Check if user is admin
-  //   if (!user || user.role !== 'admin') {
-  //     navigate('/');
-  //   }
-  // }, [user, navigate]);
+  useEffect(() => {
+    // Check if user is admin
+    if (!user || (!user.is_admin && user.role !== 'admin')) {
+      navigate('/');
+    }
+  }, [user, navigate]);
 
   useEffect(() => {
     // Trigger re-animation when tab changes
@@ -67,6 +69,7 @@ const AdminPage = () => {
     { id: 'products', label: 'Products', icon: Package },
     { id: 'coupons', label: 'Coupons', icon: Tag },
     { id: 'users', label: 'Users', icon: Users },
+    { id: 'account', label: 'Account', icon: User },
   ];
 
   const stats = [
@@ -126,14 +129,14 @@ const AdminPage = () => {
                 >
                   {theme === 'dark' ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
                 </Button>
-                <Button
+                {/* <Button
                   variant="ghost"
                   size="icon"
                   onClick={handleLogout}
                   className="w-full"
                 >
                   <LogOut className="h-5 w-5" />
-                </Button>
+                </Button> */}
               </div>
             </div>
           </SheetContent>
@@ -148,14 +151,14 @@ const AdminPage = () => {
           >
             {theme === 'dark' ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
           </Button>
-          <Button
+          {/* <Button
             variant="ghost"
             size="icon"
             onClick={handleLogout}
             className="animate-fade-in animation-delay-450"
           >
             <LogOut className="h-5 w-5" />
-          </Button>
+          </Button> */}
         </div>
       </div>
 
@@ -202,7 +205,7 @@ const AdminPage = () => {
               </>
             )}
           </Button>
-          <Button
+          {/* <Button
             variant="destructive"
             size="sm"
             onClick={handleLogout}
@@ -210,7 +213,7 @@ const AdminPage = () => {
           >
             <LogOut className="h-4 w-4 mr-2" />
             Logout
-          </Button>
+          </Button> */}
         </div>
       </aside>
 
@@ -228,6 +231,7 @@ const AdminPage = () => {
           {activeTab === 'products' && <ProductManagement />}
           {activeTab === 'coupons' && <CouponManagement />}
           {activeTab === 'users' && <UsersManagement />}
+          {activeTab === 'account' && <AccountManagement />}
         </div>
       </main>
     </div>

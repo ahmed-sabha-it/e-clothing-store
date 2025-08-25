@@ -6,8 +6,8 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Eye, EyeOff, ArrowLeft, CheckCircle, Lock } from "lucide-react";
 import { useScrollToTop } from "../../utils/scrollToTop";
-import { authAPI } from "@/lib/api";
-import { toast } from "react-toastify";
+import { userAPI } from "@/lib/api";
+import { toast } from "@/hooks/use-toast";
 
 const ChangePassword = () => {
   useScrollToTop();
@@ -43,37 +43,60 @@ const ChangePassword = () => {
     e.preventDefault();
     
     if (formData.new_password.length < 8) {
-      toast.error('New password must be at least 8 characters long');
+      toast({
+        title: "Validation Error",
+        description: "New password must be at least 8 characters long",
+        variant: "destructive",
+      });
       return;
     }
 
     if (formData.new_password !== formData.new_password_confirmation) {
-      toast.error('New passwords do not match');
+      toast({
+        title: "Validation Error",
+        description: "New passwords do not match",
+        variant: "destructive",
+      });
       return;
     }
 
     if (formData.current_password === formData.new_password) {
-      toast.error('New password must be different from current password');
+      toast({
+        title: "Validation Error",
+        description: "New password must be different from current password",
+        variant: "destructive",
+      });
       return;
     }
 
     setLoading(true);
 
     try {
-      const response = await authAPI.changePassword(formData);
+      const response = await userAPI.updatePassword(formData);
       
       if (response.success) {
         setSuccess(true);
-        toast.success('Password changed successfully!');
+        toast({
+          title: "Success",
+          description: "Password changed successfully!",
+        });
         setTimeout(() => {
-          navigate('/settings');
+          navigate('/profile');
         }, 2000);
       } else {
-        toast.error(response.message || 'Password change failed');
+        toast({
+          title: "Error",
+          description: response.message || 'Password change failed',
+          variant: "destructive",
+        });
       }
     } catch (error) {
       console.error('Change password error:', error);
-      toast.error(error.response?.data?.message || 'Password change failed');
+      toast({
+        title: "Error",
+        description: error.response?.data?.message || 'Password change failed',
+        variant: "destructive",
+      });
     } finally {
       setLoading(false);
     }
@@ -99,9 +122,9 @@ const ChangePassword = () => {
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <Link to="/settings">
+                <Link to="/profile">
                   <Button variant="primary" className="w-full bg-gradient-to-r from-orange-600 to-amber-600 hover:from-orange-700 hover:to-amber-700">
-                    Back to Settings
+                    Back to Profile
                   </Button>
                 </Link>
               </CardContent>
@@ -228,11 +251,11 @@ const ChangePassword = () => {
               
               <div className="mt-6 text-center">
                 <Link
-                  to="/settings"
+                  to="/profile"
                   className="text-sm text-orange-600 hover:text-orange-500 dark:text-orange-400 dark:hover:text-orange-300 inline-flex items-center"
                 >
                   <ArrowLeft className="mr-1 h-3 w-3" />
-                  Back to Settings
+                  Back to Profile
                 </Link>
               </div>
             </CardContent>

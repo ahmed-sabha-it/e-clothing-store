@@ -40,11 +40,13 @@ import {
   Package,
   Eye
 } from 'lucide-react';
-// import { productAPI } from '@/lib/api';
+import { productAPI, categoryAPI } from '@/lib/api';
+import { useAuth } from '@/contexts/AuthContext';
 import { toast } from '@/hooks/use-toast';
 import { normalProducts, salesProducts, newArrivalProducts } from '@/data/products';
 
 const ProductManagement = () => {
+  const { token } = useAuth();
   const [products, setProducts] = useState([]);
   const [filteredProducts, setFilteredProducts] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -55,12 +57,14 @@ const ProductManagement = () => {
   const [deleteProductId, setDeleteProductId] = useState(null);
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [imagePreview, setImagePreview] = useState('');
+  const [categories, setCategories] = useState([]);
+  const [formErrors, setFormErrors] = useState({});
   
   const [formData, setFormData] = useState({
     name: '',
     description: '',
     price: '',
-    category: '',
+    category_id: '',
     stock: '',
     image: '',
     sizes: [],
@@ -69,36 +73,53 @@ const ProductManagement = () => {
     sale_price: ''
   });
 
-  const categories = ['men', 'women', 'kids', 'accessories'];
   const sizes = ['XS', 'S', 'M', 'L', 'XL', 'XXL'];
   const colors = ['Black', 'White', 'Red', 'Blue', 'Green', 'Yellow', 'Pink', 'Gray'];
 
   useEffect(() => {
-    // fetchProducts(); // Comment out API call
-    loadMockProducts(); // Use mock data instead
+    fetchProducts();
+    fetchCategories();
   }, []);
 
   useEffect(() => {
     filterProducts();
   }, [searchTerm, selectedCategory, products]);
 
-  // Comment out API function for later use
-  // const fetchProducts = async () => {
-  //   try {
-  //     setLoading(true);
-  //     const response = await productAPI.getAll();
-  //     setProducts(response.data);
-  //     setFilteredProducts(response.data);
-  //   } catch (error) {
-  //     toast({
-  //       title: "Error",
-  //       description: "Failed to fetch products",
-  //       variant: "destructive",
-  //     });
-  //   } finally {
-  //     setLoading(false);
-  //   }
-  // };
+  const fetchProducts = async () => {
+    try {
+      setLoading(true);
+      const response = await productAPI.getAll();
+      setProducts(response.data || []);
+      setFilteredProducts(response.data || []);
+    } catch (error) {
+      console.error('Failed to fetch products:', error);
+      // Fallback to mock data if API fails
+      loadMockProducts();
+      toast({
+        title: "Warning",
+        description: "Using mock data - API connection failed",
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const fetchCategories = async () => {
+    try {
+      const response = await categoryAPI.getAll();
+      setCategories(response.data || []);
+    } catch (error) {
+      console.error('Failed to fetch categories:', error);
+      // Fallback to default categories
+      setCategories([
+        { id: 1, name: 'men' },
+        { id: 2, name: 'women' },
+        { id: 3, name: 'kids' },
+        { id: 4, name: 'accessories' }
+      ]);
+    }
+  };
 
   // Load mock products data
   const loadMockProducts = () => {
@@ -181,122 +202,143 @@ const ProductManagement = () => {
     }
   };
 
+  const validateForm = () => {
+    const errors = {};
+    
+    if (!formData.name || formData.name.length > 150) {
+      errors.name = 'Name is required and must be less than 150 characters';
+    }
+    
+    if (!formData.price || isNaN(formData.price) || parseFloat(formData.price) < 0) {
+      errors.price = 'Price is required and must be a positive number';
+    }
+    
+    if (!formData.category_id) {
+      errors.category_id = 'Category is required';
+    }
+    
+    if (formData.stock && (isNaN(formData.stock) || parseInt(formData.stock) < 0)) {
+      errors.stock = 'Stock must be a positive integer';
+    }
+    
+    setFormErrors(errors);
+    return Object.keys(errors).length === 0;
+  };
+
   const handleAddProduct = async () => {
-    // Comment out API call for later use
-    // try {
-    //   await productAPI.create(formData);
-    //   toast({
-    //     title: "Success",
-    //     description: "Product added successfully",
-    //   });
-    //   setIsAddModalOpen(false);
-    //   resetForm();
-    //   fetchProducts();
-    // } catch (error) {
-    //   toast({
-    //     title: "Error",
-    //     description: "Failed to add product",
-    //     variant: "destructive",
-    //   });
-    // }
-    
-    // Mock add product functionality
-    const newProduct = {
-      ...formData,
-      id: `mock-${Date.now()}`,
-      stock: parseInt(formData.stock),
-      price: parseFloat(formData.price),
-      sale_price: formData.sale_price ? parseFloat(formData.sale_price) : null
-    };
-    
-    setProducts(prev => [...prev, newProduct]);
-    toast({
-      title: "Success",
-      description: "Product added successfully (Mock)",
-    });
-    setIsAddModalOpen(false);
-    resetForm();
+    if (!validateForm()) {
+      const errorMessages = Object.values(formErrors).join('. ');
+      toast({
+        title: "Validation Error",
+        description: errorMessages || "Please fix the form errors before submitting",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    try {
+      const productData = {
+        name: formData.name,
+        price: parseFloat(formData.price),
+        category_id: parseInt(formData.category_id),
+        stock: formData.stock ? parseInt(formData.stock) : null,
+        description: formData.description || null
+      };
+
+      await productAPI.create(productData);
+      toast({
+        title: "Success",
+        description: "Product added successfully",
+      });
+      setIsAddModalOpen(false);
+      resetForm();
+      fetchProducts();
+    } catch (error) {
+      console.error('Failed to add product:', error);
+      const errorMessage = error.response?.data?.message || 'Failed to add product';
+      toast({
+        title: "Error",
+        description: errorMessage,
+        variant: "destructive",
+      });
+    }
   };
 
   const handleEditProduct = async () => {
-    // Comment out API call for later use
-    // try {
-    //   await productAPI.update(selectedProduct.id, formData);
-    //   toast({
-    //     title: "Success",
-    //     description: "Product updated successfully",
-    //   });
-    //   setIsEditModalOpen(false);
-    //   resetForm();
-    //   fetchProducts();
-    // } catch (error) {
-    //   toast({
-    //     title: "Error",
-    //     description: "Failed to update product",
-    //     variant: "destructive",
-    //   });
-    // }
-    
-    // Mock edit product functionality
-    const updatedProduct = {
-      ...formData,
-      id: selectedProduct.id,
-      stock: parseInt(formData.stock),
-      price: parseFloat(formData.price),
-      sale_price: formData.sale_price ? parseFloat(formData.sale_price) : null
-    };
-    
-    setProducts(prev => prev.map(p => p.id === selectedProduct.id ? updatedProduct : p));
-    toast({
-      title: "Success",
-      description: "Product updated successfully (Mock)",
-    });
-    setIsEditModalOpen(false);
-    resetForm();
+    if (!validateForm()) {
+      const errorMessages = Object.values(formErrors).join('. ');
+      toast({
+        title: "Validation Error",
+        description: errorMessages || "Please fix the form errors before submitting",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    try {
+      const productData = {
+        name: formData.name,
+        price: parseFloat(formData.price),
+        category_id: parseInt(formData.category_id),
+        stock: formData.stock ? parseInt(formData.stock) : null,
+        description: formData.description || null
+      };
+
+      await productAPI.update(selectedProduct.id, productData);
+      toast({
+        title: "Success",
+        description: "Product updated successfully",
+      });
+      setIsEditModalOpen(false);
+      resetForm();
+      fetchProducts();
+    } catch (error) {
+      console.error('Failed to update product:', error);
+      const errorMessage = error.response?.data?.message || 'Failed to update product';
+      toast({
+        title: "Error",
+        description: errorMessage,
+        variant: "destructive",
+      });
+    }
   };
 
   const handleDeleteProduct = async () => {
-    // Comment out API call for later use
-    // try {
-    //   await productAPI.delete(deleteProductId);
-    //   toast({
-    //     title: "Success",
-    //     description: "Product deleted successfully",
-    //   });
-    //   setDeleteProductId(null);
-    //   fetchProducts();
-    // } catch (error) {
-    //   toast({
-    //     title: "Error",
-    //     description: "Failed to delete product",
-    //     variant: "destructive",
-    //   });
-    // }
-    
-    // Mock delete product functionality
-    setProducts(prev => prev.filter(p => p.id !== deleteProductId));
-    toast({
-      title: "Success",
-      description: "Product deleted successfully (Mock)",
-    });
-    setDeleteProductId(null);
+    try {
+      await productAPI.delete(deleteProductId);
+      toast({
+        title: "Success",
+        description: "Product deleted successfully",
+      });
+      setDeleteProductId(null);
+      fetchProducts();
+    } catch (error) {
+      console.error('Failed to delete product:', error);
+      const errorMessage = error.response?.data?.message || 'Failed to delete product';
+      toast({
+        title: "Error",
+        description: errorMessage,
+        variant: "destructive",
+      });
+    }
   };
 
   const openEditModal = (product) => {
     setSelectedProduct(product);
     setFormData({
       name: product.name,
-      description: product.description,
+      description: product.description || '',
       price: product.price,
-      category: product.category,
-      stock: product.stock,
-      image: product.image,
+      category_id: product.category_id || product.category?.id || '',
+      stock: product.stock || '',
+      image: product.image || '',
       sizes: product.sizes || [],
       colors: product.colors || [],
       featured: product.featured || false,
       sale_price: product.sale_price || ''
     });
     setImagePreview(product.image);
+    setFormErrors({});
     setIsEditModalOpen(true);
   };
 
@@ -305,7 +347,7 @@ const ProductManagement = () => {
       name: '',
       description: '',
       price: '',
-      category: '',
+      category_id: '',
       stock: '',
       image: '',
       sizes: [],
@@ -315,6 +357,7 @@ const ProductManagement = () => {
     });
     setImagePreview('');
     setSelectedProduct(null);
+    setFormErrors({});
   };
 
   if (loading) {
@@ -346,7 +389,9 @@ const ProductManagement = () => {
           <SelectContent>
             <SelectItem value="all">All Categories</SelectItem>
             {categories.map(cat => (
-              <SelectItem key={cat} value={cat}>{cat}</SelectItem>
+              <SelectItem key={cat.id || cat} value={cat.id || cat}>
+                {cat.name || cat}
+              </SelectItem>
             ))}
           </SelectContent>
         </Select>
@@ -365,7 +410,6 @@ const ProductManagement = () => {
               </DialogDescription>
             </DialogHeader>
             <ProductForm
-            
               formData={formData}
               imagePreview={imagePreview}
               categories={categories}
@@ -380,6 +424,7 @@ const ProductManagement = () => {
                 setIsAddModalOpen(false);
                 resetForm();
               }}
+              formErrors={formErrors}
             />
           </DialogContent>
         </Dialog>
@@ -436,7 +481,7 @@ const ProductManagement = () => {
                     )}
                   </div>
                   <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400">
-                    {typeof product.category === 'object' ? product.category.name : product.category}
+                    {product.category?.name || product.category || 'N/A'}
                   </span>
                 </div>
                 <div className="flex items-center justify-between text-sm text-muted-foreground mb-3">
@@ -494,6 +539,7 @@ const ProductManagement = () => {
               resetForm();
             }}
             isEdit
+            formErrors={formErrors}
           />
         </DialogContent>
       </Dialog>
@@ -533,66 +579,81 @@ const ProductForm = ({
   handleColorToggle,
   onSubmit,
   onCancel,
-  isEdit = false
+  isEdit = false,
+  formErrors = {}
 }) => {
   return (
     <div className="space-y-6">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div className="space-y-2">
-          <Label htmlFor="name">Product Name</Label>
+          <Label htmlFor="name">Product Name *</Label>
           <Input
             id="name"
             name="name"
             value={formData.name}
             onChange={handleInputChange}
-            placeholder="Enter product name"
+            placeholder="Enter product name (max 150 characters)"
             required
+            className={formErrors.name ? 'border-red-500' : ''}
           />
+          {formErrors.name && (
+            <p className="text-sm text-red-500">{formErrors.name}</p>
+          )}
         </div>
         <div className="space-y-2">
-          <Label htmlFor="category">Category</Label>
+          <Label htmlFor="category_id">Category *</Label>
           <Select 
-            value={formData.category} 
-            onValueChange={(value) => handleInputChange({ target: { name: 'category', value } })}
+            value={formData.category_id.toString()} 
+            onValueChange={(value) => handleInputChange({ target: { name: 'category_id', value } })}
           >
-            <SelectTrigger>
+            <SelectTrigger className={formErrors.category_id ? 'border-red-500' : ''}>
               <SelectValue placeholder="Select category" />
             </SelectTrigger>
             <SelectContent>
               {categories.map(cat => (
-                <SelectItem key={cat} value={cat}>{cat}</SelectItem>
+                <SelectItem key={cat.id || cat} value={(cat.id || cat).toString()}>
+                  {cat.name || cat}
+                </SelectItem>
               ))}
             </SelectContent>
           </Select>
+          {formErrors.category_id && (
+            <p className="text-sm text-red-500">{formErrors.category_id}</p>
+          )}
         </div>
       </div>
 
       <div className="space-y-2">
         <Label htmlFor="description">Description</Label>
         <Textarea
-        className="dark:bg-gray-900"
+          className="dark:bg-gray-900"
           id="description"
           name="description"
           value={formData.description}
           onChange={handleInputChange}
-          placeholder="Enter product description"
+          placeholder="Enter product description (optional)"
           rows={3}
         />
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <div className="space-y-2">
-          <Label htmlFor="price">Price</Label>
+          <Label htmlFor="price">Price *</Label>
           <Input
             id="price"
             name="price"
             type="number"
             step="0.01"
+            min="0"
             value={formData.price}
             onChange={handleInputChange}
             placeholder="0.00"
             required
+            className={formErrors.price ? 'border-red-500' : ''}
           />
+          {formErrors.price && (
+            <p className="text-sm text-red-500">{formErrors.price}</p>
+          )}
         </div>
         <div className="space-y-2">
           <Label htmlFor="sale_price">Sale Price (Optional)</Label>
@@ -612,11 +673,15 @@ const ProductForm = ({
             id="stock"
             name="stock"
             type="number"
+            min="0"
             value={formData.stock}
             onChange={handleInputChange}
-            placeholder="0"
-            required
+            placeholder="0 (optional)"
+            className={formErrors.stock ? 'border-red-500' : ''}
           />
+          {formErrors.stock && (
+            <p className="text-sm text-red-500">{formErrors.stock}</p>
+          )}
         </div>
       </div>
 

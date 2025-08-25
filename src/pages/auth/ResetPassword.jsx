@@ -7,7 +7,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Eye, EyeOff, ArrowLeft, CheckCircle, Lock } from "lucide-react";
 import { useScrollToTop } from "../../utils/scrollToTop";
 import { authAPI } from "@/lib/api";
-import { toast } from "react-toastify";
+import { toast } from "@/hooks/use-toast";
 
 const ResetPassword = () => {
   useScrollToTop();
@@ -27,7 +27,11 @@ const ResetPassword = () => {
 
   useEffect(() => {
     if (!token || !email) {
-      toast.error('Invalid reset link');
+      toast({
+        title: "Error",
+        description: "Invalid reset link",
+        variant: "destructive",
+      });
       navigate('/signin');
     }
   }, [token, email, navigate]);
@@ -43,12 +47,20 @@ const ResetPassword = () => {
     e.preventDefault();
     
     if (formData.password.length < 8) {
-      toast.error('Password must be at least 8 characters long');
+      toast({
+        title: "Validation Error",
+        description: "Password must be at least 8 characters long",
+        variant: "destructive",
+      });
       return;
     }
 
     if (formData.password !== formData.password_confirmation) {
-      toast.error('Passwords do not match');
+      toast({
+        title: "Validation Error",
+        description: "Passwords do not match",
+        variant: "destructive",
+      });
       return;
     }
 
@@ -64,13 +76,24 @@ const ResetPassword = () => {
       
       if (response.success) {
         setResetSuccess(true);
-        toast.success('Password reset successful!');
+        toast({
+          title: "Success",
+          description: "Password reset successful!",
+        });
       } else {
-        toast.error(response.message || 'Password reset failed');
+        toast({
+          title: "Error",
+          description: response.message || 'Password reset failed',
+          variant: "destructive",
+        });
       }
     } catch (error) {
       console.error('Reset password error:', error);
-      toast.error(error.response?.data?.message || 'Password reset failed');
+      toast({
+        title: "Error",
+        description: error.response?.data?.message || 'Password reset failed',
+        variant: "destructive",
+      });
     } finally {
       setLoading(false);
     }

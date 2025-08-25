@@ -45,7 +45,13 @@ const SignIn = () => {
         // Use auth context to update global state
         login(response.data.token, response.data.user);
         toast.success("Login Successfully!");
-        navigate("/");
+        
+        // Check if user is admin and navigate accordingly
+        if (response.data.user.is_admin || response.data.user.role === 'admin') {
+          navigate("/admin");
+        } else {
+          navigate("/");
+        }
       } else {
         toast.error("Login failed. Please try again.");
       }
