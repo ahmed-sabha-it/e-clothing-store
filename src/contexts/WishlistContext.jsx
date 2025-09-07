@@ -1,26 +1,9 @@
-
 import React, { createContext, useContext, useState, useEffect } from 'react';
 
-export type WishlistItem = {
-  id: string;
-  name: string;
-  price: number;
-  image: string;
-  category: string;
-};
+const WishlistContext = createContext(undefined);
 
-type WishlistContextType = {
-  wishlistItems: WishlistItem[];
-  addToWishlist: (item: WishlistItem) => void;
-  removeFromWishlist: (id: string) => void;
-  isInWishlist: (id: string) => boolean;
-  clearWishlist: () => void;
-};
-
-const WishlistContext = createContext<WishlistContextType | undefined>(undefined);
-
-export const WishlistProvider = ({ children }: { children: React.ReactNode }) => {
-  const [wishlistItems, setWishlistItems] = useState<WishlistItem[]>(() => {
+export const WishlistProvider = ({ children }) => {
+  const [wishlistItems, setWishlistItems] = useState(() => {
     const saved = localStorage.getItem('wishlist');
     return saved ? JSON.parse(saved) : [];
   });
@@ -29,7 +12,7 @@ export const WishlistProvider = ({ children }: { children: React.ReactNode }) =>
     localStorage.setItem('wishlist', JSON.stringify(wishlistItems));
   }, [wishlistItems]);
 
-  const addToWishlist = (item: WishlistItem) => {
+  const addToWishlist = (item) => {
     setWishlistItems(prev => {
       if (prev.find(wishItem => wishItem.id === item.id)) {
         return prev;
@@ -38,11 +21,11 @@ export const WishlistProvider = ({ children }: { children: React.ReactNode }) =>
     });
   };
 
-  const removeFromWishlist = (id: string) => {
+  const removeFromWishlist = (id) => {
     setWishlistItems(prev => prev.filter(item => item.id !== id));
   };
 
-  const isInWishlist = (id: string) => {
+  const isInWishlist = (id) => {
     return wishlistItems.some(item => item.id === id);
   };
 

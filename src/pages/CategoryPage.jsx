@@ -1,27 +1,81 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import EnhancedProductCard from '@/components/EnhancedProductCard';
 import SalesCard from '@/components/SalesCard';
 import NewProductCard from "@/components/NewProductCard"
 import { getProductsByCategory } from '@/data/products';
+import { getSaleProductsByCategory } from '@/data/salesProducts';
 import { useCart } from '@/contexts/CartContext';
 import { useToast } from '@/hooks/use-toast';
 import { Filter, X } from 'lucide-react';
 import { useScrollToTop } from '../utils/scrollToTop';
+import { productAPI } from '@/lib/api';
+import { getNewArrivalProducts, formatProductsForDisplay, getProductsByCategory as filterProductsByCategory, getCategoryTitle } from '@/utils/productUtils';
 
 const CategoryPage = () => {
   useScrollToTop();
-  const { category } = useParams<{ category: string }>();
+  const { category } = useParams();
   const { addToCart } = useCart();
   const { toast } = useToast();
-  const allProducts = getProductsByCategory(category || 'all');
   
-  const [selectedSizes, setSelectedSizes] = useState<string[]>([]);
-  const [selectedColors, setSelectedColors] = useState<string[]>([]);
-  const [priceRange, setPriceRange] = useState<[number, number]>([0, 500]);
-  const [sortBy, setSortBy] = useState<string>('name');
+  const [allProducts, setAllProducts] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+  const [selectedSizes, setSelectedSizes] = useState([]);
+  const [selectedColors, setSelectedColors] = useState([]);
+  const [priceRange, setPriceRange] = useState([0, 500]);
+  const [sortBy, setSortBy] = useState('name');
 
-  const handleQuickAdd = (product: any) => {
+  // Fetch products based on category
+  useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+        
+        // Special handling for sale category - use mock sales data
+        if (category === 'sale') {
+          const saleProducts = getSaleProductsByCategory('sale');
+          setAllProducts(saleProducts);
+          setLoading(false);
+          return;
+        }
+        
+        const response = await productAPI.getAll();
+        const apiProducts = response.data || response.products || [];
+        const formattedProducts = formatProductsForDisplay(apiProducts);
+        
+        let filteredProducts;
+        
+        if (category === 'new-arrivals') {
+          // Special handling for new arrivals - filter by date
+          filteredProducts = getNewArrivalProducts(formattedProducts);
+        } else {
+          // Filter by category for men, women, kids, accessories, etc.
+          filteredProducts = filterProductsByCategory(formattedProducts, category);
+        }
+        
+        setAllProducts(filteredProducts);
+      } catch (err) {
+        console.error('Error fetching products:', err);
+        setError(err instanceof Error ? err.message : 'Failed to load products');
+        // Fallback to static data
+        if (category === 'sale') {
+          const saleProducts = getSaleProductsByCategory('sale');
+          setAllProducts(saleProducts);
+        } else {
+          const staticProducts = getProductsByCategory(category || 'all');
+          setAllProducts(staticProducts);
+        }
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchProducts();
+  }, [category]);
+
+  const handleQuickAdd = (product) => {
     const defaultSize = product.sizes[0];
     const defaultColor = product.colors[0];
     
@@ -70,17 +124,7 @@ const CategoryPage = () => {
     setPriceRange([0, 500]);
   };
 
-  const getCategoryTitle = () => {
-    switch (category) {
-      case 'men': return 'Men\'s Collection';
-      case 'women': return 'Women\'s Collection';
-      case 'kids': return 'Kids\' Collection';
-      case 'accessories': return 'Accessories';
-      case 'new-arrivals': return 'New Arrivals';
-      case 'sale': return 'Sale Items';
-      default: return 'All Products';
-    }
-  };
+  const categoryTitle = getCategoryTitle(category || 'all');
 
   return (
     <div className="py-8 animate-fade-in">
@@ -190,7 +234,7 @@ const CategoryPage = () => {
        {/* Products Grid */}
        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 animate-fade-in animation-delay-750">
           <div className="flex items-center justify-between mb-6">
-            <h1 className="text-3xl font-bold text-foreground">{getCategoryTitle()}</h1>
+            <h1 className="text-3xl font-bold text-foreground">{categoryTitle}</h1>
             <div className="flex items-center gap-4">
               <span className="text-sm text-muted-foreground">
                 {filteredProducts.length} products
@@ -208,25 +252,55 @@ const CategoryPage = () => {
             </div>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-10">
-            {filteredProducts.map((product, index) => {
-              // SIMPLE RENDERING LOGIC
-              if (product.salePrice && product.discount) {
-                // Product has sale price = use SalesCard
-                return <SalesCard key={product.id} product={product} index={index} />;
-              } else if (category === "new-arrivals" || product.id.startsWith('new-')) {
-                // New arrivals category or product ID starts with 'new-' = use NewProductCard
-                return <NewProductCard key={product.id} product={product} index={index} />;
-              } else {
-                // Normal product = use EnhancedProductCard
-                return <EnhancedProductCard key={product.id} product={product} index={index} />;
-              }
-            })}
-          </div>
+          {/* Loading State */}
+          {loading && (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-10">
+              {[...Array(8)].map((_, index) => (
+                <div key={index} className="bg-white rounded-3xl overflow-hidden shadow-xl animate-pulse">
+                  <div className="aspect-square bg-gray-200"></div>
+                  <div className="p-6 space-y-4">
+                    <div className="h-4 bg-gray-200 rounded w-3/4"></div>
+                    <div className="h-6 bg-gray-200 rounded w-full"></div>
+                    <div className="h-4 bg-gray-200 rounded w-1/2"></div>
+                    <div className="h-10 bg-gray-200 rounded w-full"></div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
 
-          {filteredProducts.length === 0 && (
+          {/* Error State */}
+          {error && !loading && (
+            <div className="text-center py-12">
+              <p className="text-red-600 mb-4">Error loading products: {error}</p>
+              <p className="text-muted-foreground">Showing fallback data</p>
+            </div>
+          )}
+
+          {/* Products Grid */}
+          {!loading && (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-10">
+              {filteredProducts.map((product, index) => {
+                // SIMPLE RENDERING LOGIC
+                if (product.salePrice && product.discount) {
+                  // Product has sale price = use SalesCard
+                  return <SalesCard key={product.id} product={product} index={index} />;
+                } else if (category === "new-arrivals" || product.id.toString().startsWith('new-')) {
+                  // New arrivals category or product ID starts with 'new-' = use NewProductCard
+                  return <NewProductCard key={product.id} product={product} index={index} />;
+                } else {
+                  // Normal product = use EnhancedProductCard
+                  return <EnhancedProductCard key={product.id} product={product} index={index} />;
+                }
+              })}
+            </div>
+          )}
+
+          {!loading && filteredProducts.length === 0 && (
             <div className="text-center py-12 animate-fade-in animation-delay-900">
-              <p className="text-muted-foreground">No products match your current filters.</p>
+              <p className="text-muted-foreground">
+                {category === 'new-arrivals' ? 'No new arrivals in the last 7 days.' : 'No products match your current filters.'}
+              </p>
               <button
                 onClick={clearFilters}
                 className="mt-4 orange-button"

@@ -1,27 +1,7 @@
-import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import React, { createContext, useContext, useState, useEffect } from 'react';
 import Cookies from 'js-cookie';
 
-interface User {
-  id: string;
-  name: string;
-  email: string;
-  profile_picture?: string;
-  avatar?: string;
-  balance?: number;
-  role?: string;
-  is_admin?: boolean;
-}
-
-interface AuthContextType {
-  isAuthenticated: boolean;
-  user: User | null;
-  token: string | null;
-  login: (token: string, userData: User) => void;
-  logout: () => void;
-  updateUser: (userData: Partial<User>) => void;
-}
-
-const AuthContext = createContext<AuthContextType | undefined>(undefined);
+const AuthContext = createContext(undefined);
 
 export const useAuth = () => {
   const context = useContext(AuthContext);
@@ -31,14 +11,10 @@ export const useAuth = () => {
   return context;
 };
 
-interface AuthProviderProps {
-  children: ReactNode;
-}
-
-export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
-  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
-  const [user, setUser] = useState<User | null>(null);
-  const [token, setToken] = useState<string | null>(null);
+export const AuthProvider = ({ children }) => {
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [user, setUser] = useState(null);
+  const [token, setToken] = useState(null);
 
   // Initialize auth state from cookies and localStorage on mount
   useEffect(() => {
@@ -60,7 +36,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     }
   }, []);
 
-  const login = (newToken: string, userData: User) => {
+  const login = (newToken, userData) => {
     setToken(newToken);
     setUser(userData);
     setIsAuthenticated(true);
@@ -80,7 +56,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     localStorage.removeItem('user');
   };
 
-  const updateUser = (userData: Partial<User>) => {
+  const updateUser = (userData) => {
     if (user) {
       const updatedUser = { ...user, ...userData };
       setUser(updatedUser);
@@ -88,7 +64,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     }
   };
 
-  const value: AuthContextType = {
+  const value = {
     isAuthenticated,
     user,
     token,

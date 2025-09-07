@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import EnhancedProductCard from './EnhancedProductCard';
 import NewProductCard from './NewProductCard';
 import { newArrivalProducts } from '@/data/products';
@@ -8,10 +8,40 @@ import { useToast } from '@/hooks/use-toast';
 import Icon from '@/components/AppIcon';
 import Button from '@/components/ui/Button';
 import { toast } from 'react-toastify';
+import { productAPI } from '@/lib/api';
+import { getLatestProducts, formatProductsForDisplay } from '@/utils/productUtils';
+
 const FeaturedProducts = () => {
   const { addToCart } = useCart();
-  // const { toast } = useToast();
-  const featuredProducts = newArrivalProducts.slice(0, 4);
+  const [products, setProducts] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  // Fetch products from API
+  useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        setLoading(true);
+        const response = await productAPI.getAll();
+        const allProducts = response.data || response.products || [];
+        const formattedProducts = formatProductsForDisplay(allProducts);
+        const latestProducts = getLatestProducts(formattedProducts, 4);
+        setProducts(latestProducts);
+      } catch (err) {
+        console.error('Error fetching products:', err);
+        setError(err.message);
+        // Fallback to static data if API fails
+        const fallbackProducts = newArrivalProducts.slice(0, 4);
+        setProducts(fallbackProducts);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchProducts();
+  }, []);
+
+  const featuredProducts = products;
 
   const handleQuickAdd = (product) => {
     // Add with default size and color
@@ -71,15 +101,52 @@ const FeaturedProducts = () => {
           </Link>
         </div>
  
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-10">
-          {featuredProducts.map((product, index) => (
-            <NewProductCard 
-              key={product.id} 
-              product={product}
-              index={index}
-            />
-          ))}
-        </div>
+        {/* Loading State */}
+        {loading && (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-10">
+            {[...Array(4)].map((_, index) => (
+              <div key={index} className="bg-white rounded-3xl overflow-hidden shadow-xl animate-pulse">
+                <div className="aspect-square bg-gray-200"></div>
+                <div className="p-6 space-y-4">
+                  <div className="h-4 bg-gray-200 rounded w-3/4"></div>
+                  <div className="h-6 bg-gray-200 rounded w-full"></div>
+                  <div className="h-4 bg-gray-200 rounded w-1/2"></div>
+                  <div className="h-10 bg-gray-200 rounded w-full"></div>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+
+        {/* Error State */}
+        {error && !loading && (
+          <div className="text-center py-12">
+            <Icon name="AlertCircle" size={48} className="mx-auto text-red-500 mb-4" />
+            <p className="text-gray-600 mb-4">Failed to load new arrivals</p>
+            <p className="text-sm text-gray-500">Showing fallback products</p>
+          </div>
+        )}
+
+        {/* Products Grid */}
+        {!loading && featuredProducts.length > 0 && (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-10">
+            {featuredProducts.map((product, index) => (
+              <NewProductCard 
+                key={product.id} 
+                product={product}
+                index={index}
+              />
+            ))}
+          </div>
+        )}
+
+        {/* Empty State */}
+        {!loading && featuredProducts.length === 0 && (
+          <div className="text-center py-12">
+            <Icon name="Package" size={48} className="mx-auto text-gray-400 mb-4" />
+            <p className="text-gray-600">No new arrivals available</p>
+          </div>
+        )}
         {/* Mobile View All Button */}
         <div className="mt-12 text-center lg:hidden">
           <Link to="/category/new-arrivals">

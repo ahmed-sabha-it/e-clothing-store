@@ -1,56 +1,15 @@
-
 import React, { createContext, useContext, useState, useEffect } from 'react';
+import { couponAPI } from '@/lib/api';
 
-export type CartItem = {
-  id: string;
-  name: string;
-  price: number;
-  image: string;
-  size: string;
-  color: string;
-  quantity: number;
-  category: string;
-};
+const CartContext = createContext(undefined);
 
-export type Coupon = {
-  code: string;
-  type: 'percentage' | 'fixed';
-  value: number;
-  isValid: boolean;
-};
-
-type CartContextType = {
-  cartItems: CartItem[];
-  coupon: Coupon | null;
-  addToCart: (item: Omit<CartItem, 'quantity'>) => void;
-  removeFromCart: (id: string, size: string, color: string) => void;
-  updateQuantity: (id: string, size: string, color: string, quantity: number) => void;
-  clearCart: () => void;
-  getTotalItems: () => number;
-  getTotalPrice: () => number;
-  getDiscountAmount: () => number;
-  getFinalTotal: () => number;
-  applyCoupon: (code: string) => boolean;
-  removeCoupon: () => void;
-};
-
-const CartContext = createContext<CartContextType | undefined>(undefined);
-
-// Valid coupons for demo
-const validCoupons: Record<string, Omit<Coupon, 'code' | 'isValid'>> = {
-  'SAVE10': { type: 'percentage', value: 10 },
-  'SAVE20': { type: 'percentage', value: 20 },
-  'SAVE50': { type: 'fixed', value: 50 },
-  'WELCOME15': { type: 'percentage', value: 15 },
-};
-
-export const CartProvider = ({ children }: { children: React.ReactNode }) => {
-  const [cartItems, setCartItems] = useState<CartItem[]>(() => {
+export const CartProvider = ({ children }) => {
+  const [cartItems, setCartItems] = useState(() => {
     const saved = localStorage.getItem('cart');
     return saved ? JSON.parse(saved) : [];
   });
 
-  const [coupon, setCoupon] = useState<Coupon | null>(() => {
+  const [coupon, setCoupon] = useState(() => {
     const saved = localStorage.getItem('coupon');
     return saved ? JSON.parse(saved) : null;
   });
@@ -67,7 +26,7 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
     }
   }, [coupon]);
 
-  const addToCart = (item: Omit<CartItem, 'quantity'>) => {
+  const addToCart = (item) => {
     setCartItems(prev => {
       const existingItem = prev.find(
         cartItem => cartItem.id === item.id && 
@@ -89,13 +48,13 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
     });
   };
 
-  const removeFromCart = (id: string, size: string, color: string) => {
+  const removeFromCart = (id, size, color) => {
     setCartItems(prev => prev.filter(
       item => !(item.id === id && item.size === size && item.color === color)
     ));
   };
 
-  const updateQuantity = (id: string, size: string, color: string, quantity: number) => {
+  const updateQuantity = (id, size, color, quantity) => {
     if (quantity <= 0) {
       removeFromCart(id, size, color);
       return;
@@ -117,13 +76,19 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
   const getTotalPrice = () => cartItems.reduce((total, item) => total + item.price * item.quantity, 0);
 
   const getDiscountAmount = () => {
-    if (!coupon || !coupon.isValid) return 0;
+    if (!coupon || !coupon.is_active) return 0;
     
     const subtotal = getTotalPrice();
-    if (coupon.type === 'percentage') {
-      return subtotal * (coupon.value / 100);
+    
+    // Check minimum purchase requirement
+    if (coupon.minimum_purchase && subtotal < coupon.minimum_purchase) {
+      return 0;
+    }
+    
+    if (coupon.discount_type === 'percentage') {
+      return subtotal * (coupon.discount_value / 100);
     } else {
-      return Math.min(coupon.value, subtotal);
+      return Math.min(coupon.discount_value, subtotal);
     }
   };
 
@@ -131,17 +96,20 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
     return getTotalPrice() - getDiscountAmount();
   };
 
-  const applyCoupon = (code: string): boolean => {
-    const upperCode = code.toUpperCase();
-    if (validCoupons[upperCode]) {
-      setCoupon({
-        code: upperCode,
-        ...validCoupons[upperCode],
-        isValid: true,
-      });
-      return true;
+  const applyCoupon = async (code) => {
+    try {
+      const totalAmount = getTotalPrice();
+      const response = await couponAPI.apply(code, totalAmount);
+      if (response.status && response.data) {
+        setCoupon(response.data.coupon);
+        return true;
+      } else {
+        return false;
+      }
+    } catch (err) {
+      console.error('Error applying coupon:', err);
+      return false;
     }
-    return false;
   };
 
   const removeCoupon = () => {

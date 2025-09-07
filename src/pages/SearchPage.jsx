@@ -8,36 +8,75 @@ import { useCart } from '@/contexts/CartContext';
 import { useToast } from '@/hooks/use-toast';
 import { Filter, X, Search } from 'lucide-react';
 import { useScrollToTop } from '../utils/scrollToTop';
+import { productAPI } from '@/lib/api';
+import { formatProductsForDisplay } from '@/utils/productUtils';
 
 const SearchPage = () => {
+
   useScrollToTop();
   const [searchParams, setSearchParams] = useSearchParams();
   const { addToCart } = useCart();
   const { toast } = useToast();
   
   const [searchQuery, setSearchQuery] = useState(searchParams.get('q') || '');
-  const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
-  const [selectedSizes, setSelectedSizes] = useState<string[]>([]);
-  const [selectedColors, setSelectedColors] = useState<string[]>([]);
-  const [priceRange, setPriceRange] = useState<[number, number]>([0, 500]);
-  const [sortBy, setSortBy] = useState<string>('name');
+  const [selectedCategories, setSelectedCategories] = useState([]);
+  const [priceRange, setPriceRange] = useState([0, 500]);
+  const [sortBy, setSortBy] = useState('name');
+  
+  // API state
+  const [allProducts, setAllProducts] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+  const [hasSearched, setHasSearched] = useState(false);
 
-  // Get all products from all categories
-  const allProducts = [
-    ...getProductsByCategory('men'),
-    ...getProductsByCategory('women'),
-    ...getProductsByCategory('kids'),
-    ...getProductsByCategory('accessories'),
-    ...getProductsByCategory('new-arrivals'),
-    ...getProductsByCategory('sale')
-  ];
+  // Fetch all products from API when user searches
+  const fetchAllProducts = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      
+      const response = await productAPI.getAll();
+      const apiProducts = response.data || response.products || response || [];
+      const formattedProducts = formatProductsForDisplay(apiProducts);
+      
+      setAllProducts(formattedProducts);
+    } catch (err) {
+      console.error('Error fetching products:', err);
+      setError(err instanceof Error ? err.message : 'Failed to load products');
+      
+      // Fallback to static data if API fails
+      const staticProducts = [
+        ...getProductsByCategory('men'),
+        ...getProductsByCategory('women'),
+        ...getProductsByCategory('kids'),
+        ...getProductsByCategory('accessories'),
+        ...getProductsByCategory('new-arrivals'),
+        ...getProductsByCategory('sale')
+      ];
+      
+      // Remove duplicates based on product id
+      const uniqueStaticProducts = staticProducts.filter((product, index, self) => 
+        index === self.findIndex(p => p.id === product.id)
+      );
+      
+      setAllProducts(uniqueStaticProducts);
+    } finally {
+      setLoading(false);
+    }
+  };
 
-  // Remove duplicates based on product id
-  const uniqueProducts = allProducts.filter((product, index, self) => 
-    index === self.findIndex(p => p.id === product.id)
-  );
-
-  const handleQuickAdd = (product: any) => {
+  // Trigger search when user types or applies filters
+  useEffect(() => {
+    if (searchQuery.trim() || selectedCategories.length > 0 || priceRange[0] > 0 || priceRange[1] < 500) {
+      if (!hasSearched) {
+        setHasSearched(true);
+        fetchAllProducts();
+      }
+    }
+  }, [searchQuery, selectedCategories, priceRange, hasSearched]);
+  
+ 
+  const handleQuickAdd = (product) => {
     const defaultSize = product.sizes[0];
     const defaultColor = product.colors[0];
     
@@ -66,7 +105,7 @@ const SearchPage = () => {
     }
   }, [searchQuery, setSearchParams]);
 
-  const filteredProducts = uniqueProducts
+  const filteredProducts = allProducts
     .filter(product => {
       // Search query filter
       const searchMatch = !searchQuery || 
@@ -78,18 +117,10 @@ const SearchPage = () => {
       const categoryMatch = selectedCategories.length === 0 || 
         selectedCategories.includes(product.category);
       
-      // Size filter
-      const sizeMatch = selectedSizes.length === 0 || 
-        selectedSizes.some(size => product.sizes.includes(size));
-      
-      // Color filter
-      const colorMatch = selectedColors.length === 0 || 
-        selectedColors.some(color => product.colors.includes(color.toLowerCase()));
-      
       // Price filter
       const priceMatch = product.price >= priceRange[0] && product.price <= priceRange[1];
-      
-      return searchMatch && categoryMatch && sizeMatch && colorMatch && priceMatch;
+
+      return searchMatch && categoryMatch && priceMatch;
     })
     .sort((a, b) => {
       switch (sortBy) {
@@ -107,52 +138,14 @@ const SearchPage = () => {
     });
 
   // Get unique filter options
-  const allCategories = [...new Set(uniqueProducts.map(p => p.category))];
-  const allSizes = [...new Set(uniqueProducts.flatMap(p => p.sizes))];
-  const allColors = [...new Set(uniqueProducts.flatMap(p => p.colors))];
-
-  // Color mapping for display
-  const getColorStyle = (color: string) => {
-    const colorMap: { [key: string]: string } = {
-      'black': '#000000',
-      'white': '#ffffff',
-      'gray': '#6b7280',
-      'grey': '#6b7280',
-      'navy': '#1e3a8a',
-      'blue': '#3b82f6',
-      'light-blue': '#7dd3fc',
-      'red': '#ef4444',
-      'green': '#22c55e',
-      'yellow': '#eab308',
-      'orange': '#f97316',
-      'pink': '#ec4899',
-      'purple': '#a855f7',
-      'brown': '#92400e',
-      'tan': '#d2b48c',
-      'beige': '#f5f5dc',
-      'cream': '#fffdd0',
-      'burgundy': '#800020',
-      'gold': '#ffd700',
-      'silver': '#c0c0c0',
-      'floral': '#ff69b4',
-      'floral-blue': '#4169e1',
-      'floral-pink': '#ff1493',
-      'rainbow': 'linear-gradient(45deg, #ff0000, #ff8000, #ffff00, #80ff00, #00ff00, #00ff80, #00ffff, #0080ff, #0000ff, #8000ff, #ff00ff, #ff0080)'
-    };
-    
-    return colorMap[color.toLowerCase()] || color;
-  };
+  const allCategories = [...new Set(allProducts.map(p => p.category))];
 
   const clearFilters = () => {
     setSelectedCategories([]);
-    setSelectedSizes([]);
-    setSelectedColors([]);
     setPriceRange([0, 500]);
   };
 
   const hasActiveFilters = selectedCategories.length > 0 || 
-    selectedSizes.length > 0 || 
-    selectedColors.length > 0 || 
     priceRange[0] > 0 || 
     priceRange[1] < 500;
 
@@ -227,66 +220,6 @@ const SearchPage = () => {
                 </div>
               </div>
 
-              {/* Size Filter */}
-              <div>
-                <h4 className="font-medium text-foreground mb-3">Size</h4>
-                <div className="flex flex-wrap gap-2">
-                  {allSizes.map((size) => (
-                    <button
-                      key={size}
-                      onClick={() => {
-                        setSelectedSizes(prev =>
-                          prev.includes(size)
-                            ? prev.filter(s => s !== size)
-                            : [...prev, size]
-                        );
-                      }}
-                      className={`px-3 py-1 rounded-md border transition-colors text-sm ${
-                        selectedSizes.includes(size)
-                          ? 'border-primary bg-primary text-white'
-                          : 'border-gray-300 dark:border-gray-600 hover:border-primary hover:text-primary'
-                      }`}
-                    >
-                      {size}
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              {/* Color Filter */}
-              <div>
-                <h4 className="font-medium text-foreground mb-3">Color</h4>
-                <div className="flex flex-wrap gap-2">
-                  {allColors.map((color) => {
-                    const colorStyle = getColorStyle(color);
-                    const isGradient = colorStyle.includes('gradient');
-                    
-                    return (
-                      <button
-                        key={color}
-                        onClick={() => {
-                          setSelectedColors(prev =>
-                            prev.includes(color)
-                              ? prev.filter(c => c !== color)
-                              : [...prev, color]
-                          );
-                        }}
-                        className={`w-8 h-8 rounded-full border-2 transition-transform relative ${
-                          selectedColors.includes(color)
-                            ? 'border-primary scale-110 ring-2 ring-primary/30'
-                            : 'border-gray-300 dark:border-gray-600 hover:scale-105'
-                        }`}
-                        style={isGradient ? { background: colorStyle } : { backgroundColor: colorStyle }}
-                        title={color.charAt(0).toUpperCase() + color.slice(1)}
-                      >
-                        {color === 'white' && (
-                          <div className="absolute inset-0.5 rounded-full border border-gray-200" />
-                        )}
-                      </button>
-                    );
-                  })}
-                </div>
-              </div>
 
               {/* Price Range */}
               <div>
@@ -325,31 +258,70 @@ const SearchPage = () => {
 
         {/* Results */}
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between mb-6">
-            <div>
-              <h2 className="text-2xl font-bold text-foreground">
-                {searchQuery ? `Search Results for "${searchQuery}"` : 'All Products'}
-              </h2>
-              <p className="text-muted-foreground mt-1">
-                {filteredProducts.length} product{filteredProducts.length !== 1 ? 's' : ''} found
-              </p>
+          {hasSearched && (
+            <div className="flex items-center justify-between mb-6">
+              <div>
+                <h2 className="text-2xl font-bold text-foreground">
+                  {searchQuery ? `Search Results for "${searchQuery}"` : 'Search Results'}
+                </h2>
+                <p className="text-muted-foreground mt-1">
+                  {loading ? 'Loading...' : `${filteredProducts.length} product${filteredProducts.length !== 1 ? 's' : ''} found`}
+                </p>
+                {error && (
+                  <p className="text-red-600 text-sm mt-1">
+                    Error loading products: {error} (showing fallback data)
+                  </p>
+                )}
+              </div>
+              <div className="flex items-center gap-4">
+                <select
+                  value={sortBy}
+                  onChange={(e) => setSortBy(e.target.value)}
+                  className="px-4 py-2 border border-gray-200 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
+                  disabled={loading}
+                >
+                  <option value="name">Sort by Name</option>
+                  <option value="price-asc">Price: Low to High</option>
+                  <option value="price-desc">Price: High to Low</option>
+                  <option value="rating">Highest Rated</option>
+                  <option value="newest">Newest First</option>
+                </select>
+              </div>
             </div>
-            <div className="flex items-center gap-4">
-              <select
-                value={sortBy}
-                onChange={(e) => setSortBy(e.target.value)}
-                className="px-4 py-2 border border-gray-200 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
-              >
-                <option value="name">Sort by Name</option>
-                <option value="price-asc">Price: Low to High</option>
-                <option value="price-desc">Price: High to Low</option>
-                <option value="rating">Highest Rated</option>
-                <option value="newest">Newest First</option>
-              </select>
-            </div>
-          </div>
+          )}
 
-          {filteredProducts.length > 0 ? (
+          {/* Loading State */}
+          {loading && (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+              {[...Array(8)].map((_, index) => (
+                <div key={index} className="bg-white dark:bg-gray-800 rounded-2xl overflow-hidden shadow-lg animate-pulse">
+                  <div className="aspect-square bg-gray-200 dark:bg-gray-700"></div>
+                  <div className="p-6 space-y-4">
+                    <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-3/4"></div>
+                    <div className="h-6 bg-gray-200 dark:bg-gray-700 rounded w-full"></div>
+                    <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-1/2"></div>
+                    <div className="h-10 bg-gray-200 dark:bg-gray-700 rounded w-full"></div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+
+          {/* Empty State - No Search */}
+          {!hasSearched && !loading && (
+            <div className="text-center py-16">
+              <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-2xl p-12 max-w-md mx-auto">
+                <Search className="h-16 w-16 mx-auto text-muted-foreground mb-4" />
+                <h3 className="text-xl font-semibold text-foreground mb-2">Start searching for products</h3>
+                <p className="text-muted-foreground">
+                  Use the search bar above or apply filters to find products
+                </p>
+              </div>
+            </div>
+          )}
+
+          {/* Products Grid */}
+          {hasSearched && !loading && filteredProducts.length > 0 && (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
               {filteredProducts.map((product, index) => {
                 // Use same rendering logic as CategoryPage
@@ -362,7 +334,10 @@ const SearchPage = () => {
                 }
               })}
             </div>
-          ) : (
+          )}
+
+          {/* No Results */}
+          {hasSearched && !loading && filteredProducts.length === 0 && (
             <div className="text-center py-16">
               <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-2xl p-12 max-w-md mx-auto">
                 <Search className="h-16 w-16 mx-auto text-muted-foreground mb-4" />

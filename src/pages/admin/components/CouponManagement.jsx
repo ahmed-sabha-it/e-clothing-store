@@ -430,7 +430,7 @@ const CouponManagement = () => {
           {filteredCoupons.map((coupon, index) => (
             <Card 
               key={coupon.id} 
-              className="p-6 hover:shadow-lg  transition-all duration-300 animate-fade-in"
+              className="p-6 hover:shadow-lg dark:bg-gray-800 transition-all duration-300 animate-fade-in"
               style={{ animationDelay: `${150 + index * 100}ms` }}
             >
               <div className="flex items-start justify-between mb-4">
@@ -499,7 +499,7 @@ const CouponManagement = () => {
                 <Button
                   variant="outline"
                   size="sm"
-                  className="flex-1 border-orange-200 dark:border-gray-700 hover:bg-orange-100/50 dark:hover:bg-gray-800/50"
+                  className="flex-1 border-orange-200 dark:border-gray-700 dark:bg-gray-500 hover:bg-orange-100/50 dark:hover:bg-gray-600"
                   onClick={() => openEditModal(coupon)}
                 >
                   <Edit className="h-4 w-4 mr-1" />

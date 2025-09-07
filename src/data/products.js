@@ -1,21 +1,5 @@
-// Simple Product type
-export type Product = {
-  id: string;
-  name: string;
-  price: number;
-  salePrice?: number;
-  discount?: number;
-  brand?: string;
-  image: string;
-  category: string;
-  rating: number;
-  reviews: number;
-  colors: string[];
-  sizes: string[];
-};
-
 // NORMAL PRODUCTS
-export const normalProducts: Product[] = [
+export const normalProducts = [
   {
     id: '1',
     name: 'Classic Cotton T-Shirt',
@@ -67,7 +51,7 @@ export const normalProducts: Product[] = [
 ];
 
 // SALES PRODUCTS
-export const salesProducts: Product[] = [
+export const salesProducts = [
   {
     id: 'sale-1',
     name: 'Vintage Denim Jacket',
@@ -127,7 +111,7 @@ export const salesProducts: Product[] = [
 ];
 
 // NEW ARRIVAL PRODUCTS
-export const newArrivalProducts: Product[] = [
+export const newArrivalProducts = [
   {
     id: 'new-1',
     name: 'Modern Polo Shirt',
@@ -152,7 +136,6 @@ export const newArrivalProducts: Product[] = [
     colors: ['cream', 'black', 'navy'],
     sizes: ['XS', 'S', 'M', 'L']
   },
- 
   {
     id: 'new-4',
     name: 'Designer Sunglasses',
@@ -264,7 +247,7 @@ export const newArrivalProducts: Product[] = [
 ];
 
 // SIMPLE FUNCTIONS TO GET PRODUCTS
-export const getProductsByCategory = (category: string) => {
+export const getProductsByCategory = (category) => {
   // Get all products combined
   const allProducts = [...normalProducts, ...salesProducts, ...newArrivalProducts];
   
@@ -276,7 +259,7 @@ export const getProductsByCategory = (category: string) => {
   return allProducts.filter(p => p.category === category);
 };
 
-export const getProductById = (id: string) => {
+export const getProductById = (id) => {
   const allProducts = [...normalProducts, ...salesProducts, ...newArrivalProducts];
   return allProducts.find(p => p.id === id);
 };

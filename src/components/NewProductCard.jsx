@@ -2,6 +2,7 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import Icon from '@/components/AppIcon';
 import Image from '@/components/AppImage';
+import StarRating from '@/components/StarRating';
 import { useWishlist } from '@/contexts/WishlistContext';
 import { useCart } from '@/contexts/CartContext';
 import { useToast } from '@/hooks/use-toast';
@@ -131,23 +132,6 @@ const NewProductCard = ({ product, index = 0 }) => {
           </span>
         </div>
 
-        {/* Colors (if available) */}
-        {product?.colors && product.colors.length > 0 && (
-          <div className="flex gap-2">
-            {product.colors.slice(0, 4).map((color, colorIndex) => (
-              <div
-                key={colorIndex}
-                className="w-5 h-5 rounded-full border-2 border-gray-200 shadow-sm ring-2 ring-emerald-100"
-                style={{ backgroundColor: color.toLowerCase() }}
-              />
-            ))}
-            {product.colors.length > 4 && (
-              <span className="text-xs text-gray-500 font-medium flex items-center">
-                +{product.colors.length - 4}
-              </span>
-            )}
-          </div>
-        )}
 
         {/* Enhanced Price with NEW styling */}
         <div className="flex items-center justify-between">

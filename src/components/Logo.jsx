@@ -3,22 +3,15 @@ import { Link } from 'react-router-dom';
 import { cn } from '@/lib/utils';
 import Icon from '@/components/AppIcon';
 
-interface LogoProps {
-  /**
-   * Controls the text size. `sm` is used in the header, `lg` in the footer.
-   */
-  size?: 'sm' | 'lg';
-  /**
-   * Extra classes forwarded to the root element.
-   */
-  className?: string;
-}
-
 /**
  * Unified Store Logo used in both Header and Footer to keep styles consistent.
  * It renders the gradient icon box followed by the brand name.
+ * 
+ * @param {Object} props - Component props
+ * @param {'sm' | 'lg'} [props.size='sm'] - Controls the text size. `sm` is used in the header, `lg` in the footer.
+ * @param {string} [props.className=''] - Extra classes forwarded to the root element.
  */
-const Logo: React.FC<LogoProps> = ({ size = 'sm', className = '' }) => {
+const Logo = ({ size = 'sm', className = '' }) => {
   const textSize = size === 'lg' ? 'text-2xl' : 'text-xl';
 
   return (

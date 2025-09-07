@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { authAPI } from '../../lib/api';
+import { authAPI, userAPI } from '../../lib/api';
 import { useAuth } from '../../contexts/AuthContext';
+import { useScrollToTop } from '../../utils/scrollToTop';
 // import Header from '../../components/ui/Header';
 import Icon from '../../components/AppIcon';
 import ProfileHeader from './components/ProfileHeader';
@@ -14,6 +15,7 @@ import PreferencesSettings from './components/PreferencesSettings';
 import ConfirmationModal from './components/ConfirmationModal';
 
 const UserProfileManagement = () => {
+  useScrollToTop();
   const location = useLocation();
   const navigate = useNavigate();
   const { logout } = useAuth();
@@ -21,17 +23,19 @@ const UserProfileManagement = () => {
   const [isEditingProfile, setIsEditingProfile] = useState(false);
   const [isLoggingOut, setIsLoggingOut] = useState(false);
   const [showLogoutModal, setShowLogoutModal] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
-  // Mock user data
+  // User data from API
   const [userData, setUserData] = useState({
-    name: 'John Doe',
-    email: 'john.doe@example.com',
-    phone: '+963 996-944-873',
-    avatar: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face',
-    memberSince: '2022',
-    location: 'Lattakia-Syria',
-    dateOfBirth: '1990-05-15',
-    gender: 'male'
+    name: '',
+    email: '',
+    phone: '',
+    avatar: '',
+    memberSince: '',
+    location: '',
+    dateOfBirth: '',
+    gender: ''
   });
 
   const [loyaltyData] = useState({
@@ -232,6 +236,38 @@ const UserProfileManagement = () => {
     { id: 'preferences', label: 'Settings', icon: 'Settings' }
   ];
 
+  // Fetch user profile data from API
+  useEffect(() => {
+    const fetchUserProfile = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+        
+        const response = await userAPI.getProfile();
+        const user = response.data || response.user || response;
+        
+        setUserData({
+          name: user.name || '',
+          email: user.email || '',
+          phone: user.phone || '',
+          avatar: user.profile_picture || user.avatar || '',
+          memberSince: user.created_at ? new Date(user.created_at).getFullYear().toString() : '',
+          location: user.location || user.address || '',
+          dateOfBirth: user.date_of_birth || user.dateOfBirth || '',
+          gender: user.gender || ''
+        });
+        
+      } catch (err) {
+        console.error('Error fetching user profile:', err);
+        setError('Failed to load profile data');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchUserProfile();
+  }, []);
+
   // Handle URL parameters for tab switching
   useEffect(() => {
     const urlParams = new URLSearchParams(location.search);
@@ -246,12 +282,26 @@ const UserProfileManagement = () => {
     setIsEditingProfile(true);
   };
 
-  const handleSaveProfile = (formData) => {
-    setUserData(prev => ({
-      ...prev,
-      ...formData
-    }));
-    setIsEditingProfile(false);
+  const handleSaveProfile = async (formData) => {
+    try {
+      setLoading(true);
+      
+      // Update profile via API
+      await userAPI.updateProfile(formData);
+      
+      // Update local state
+      setUserData(prev => ({
+        ...prev,
+        ...formData
+      }));
+      
+      setIsEditingProfile(false);
+    } catch (err) {
+      console.error('Error updating profile:', err);
+      setError('Failed to update profile');
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleCancelEdit = () => {
@@ -331,6 +381,36 @@ const UserProfileManagement = () => {
   const handleCancelLogout = () => {
     setShowLogoutModal(false);
   };
+
+  // Loading state
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-orange-50 via-amber-50 to-yellow-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-700 flex items-center justify-center">
+        <div className="text-center">
+          <Icon name="Loader2" size={48} className="animate-spin text-orange-600 mx-auto mb-4" />
+          <p className="text-gray-600 dark:text-gray-300">Loading profile...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Error state
+  if (error) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-orange-50 via-amber-50 to-yellow-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-700 flex items-center justify-center">
+        <div className="text-center">
+          <Icon name="AlertCircle" size={48} className="text-red-600 mx-auto mb-4" />
+          <p className="text-red-600 mb-4">{error}</p>
+          <button 
+            onClick={() => window.location.reload()} 
+            className="px-4 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700 transition-colors"
+          >
+            Retry
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-orange-50 via-amber-50 to-yellow-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-700 animate-fade-in">

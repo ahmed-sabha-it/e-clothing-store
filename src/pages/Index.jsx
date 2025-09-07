@@ -3,11 +3,13 @@ import React from 'react';
 import HeroSection from '@/components/HeroSection';
 import CategoryGrid from '@/components/CategoryGrid';
 import FeaturedProducts from '@/components/FeaturedProducts';
-import AccessoriesSection from '@/components/AccessoriesSection';
+
 import SalesSection from '@/components/SalesSection';
 import { getProductsByCategory } from '@/data/products';
+import { useScrollToTop } from '@/utils/scrollToTop';
 
 const Index = () => {
+  useScrollToTop();
   const saleProducts = getProductsByCategory('sale');
   
   
@@ -17,7 +19,6 @@ const Index = () => {
       <CategoryGrid />
       <FeaturedProducts />
       <SalesSection products={saleProducts} loading={false} />
-      <AccessoriesSection />
     </div>
   );
 };

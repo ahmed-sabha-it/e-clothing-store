@@ -14,6 +14,7 @@ import Footer from "@/components/Footer";
 import Index from "./pages/Index";
 import CategoryPage from "./pages/CategoryPage";
 import ProductPage from "./pages/ProductPage";
+import ProductDetail from "./pages/ProductDetail";
 import CartPage from "./pages/CartPage";
 import CheckoutPage from "./pages/CheckoutPage";
 import WishlistPage from "./pages/WishlistPage";
@@ -68,7 +69,7 @@ const App = () => (
                         <Routes>
                           <Route path="/" element={<Index />} />
                           <Route path="/category/:category" element={<CategoryPage />} />
-                          <Route path="/product/:id" element={<ProductPage />} />
+                          <Route path="/product/:id" element={<ProductDetail />} />
                           <Route path="/cart" element={<CartPage />} />
                           <Route path="/checkout" element={<CheckoutPage />} />
                           <Route path="/wishlist" element={<WishlistPage />} />

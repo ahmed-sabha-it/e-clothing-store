@@ -1,15 +1,9 @@
-
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import Cookies from 'js-cookie';
 
-type ThemeContextType = {
-  isDark: boolean;
-  toggleTheme: () => void;
-};
+const ThemeContext = createContext(undefined);
 
-const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
-
-export const ThemeProvider = ({ children }: { children: React.ReactNode }) => {
+export const ThemeProvider = ({ children }) => {
   const [isDark, setIsDark] = useState(() => {
     // Check for saved theme preference immediately
     if (typeof window !== 'undefined') {

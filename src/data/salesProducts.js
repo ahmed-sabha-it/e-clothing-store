@@ -1,19 +1,6 @@
 // Men's Sale Products
 export const menSaleProducts = [
-  {
-    id: 'men-sale-1',
-    name: 'Vintage Denim Jacket',
-    brand: 'ThreadWear',
-    image: 'https://images.unsplash.com/photo-1541099649105-f69ad21f3246?auto=format&fit=crop&w=800&q=80',
-    price: 120,
-    salePrice: 79,
-    discount: 34,
-    rating: 4.5,
-    reviews: 89,
-    category: 'men',
-    colors: ['blue', 'black', 'gray'],
-    sizes: ['S', 'M', 'L', 'XL']
-  },
+
   {
     id: 'men-sale-2',
     name: 'Premium Cotton Polo',
@@ -60,52 +47,13 @@ export const womenSaleProducts = [
     colors: ['floral-blue', 'floral-pink', 'floral-green'],
     sizes: ['XS', 'S', 'M', 'L', 'XL']
   },
-  {
-    id: 'women-sale-2',
-    name: 'Silk Blouse',
-    brand: 'LuxeFashion',
-    image: 'https://images.unsplash.com/photo-1564257577-0ad5e4d2b6e8?auto=format&fit=crop&w=800&q=80',
-    price: 95,
-    salePrice: 62,
-    discount: 35,
-    rating: 4.7,
-    reviewCount: 142,
-    category: 'women',
-    colors: ['cream', 'black', 'navy', 'burgundy'],
-    sizes: ['XS', 'S', 'M', 'L']
-  },
-  {
-    id: 'women-sale-3',
-    name: 'High-Waist Jeans',
-    brand: 'DenimCo',
-    image: 'https://images.unsplash.com/photo-1541099649105-f69ad21f3246?auto=format&fit=crop&w=800&q=80',
-    price: 78,
-    salePrice: 51,
-    discount: 35,
-    rating: 4.5,
-    reviewCount: 187,
-    category: 'women',
-    colors: ['dark-blue', 'light-blue', 'black'],
-    sizes: ['24', '26', '28', '30', '32']
-  }
+ 
+  
 ];
 
 // Kids' Sale Products
 export const kidsSaleProducts = [
-  {
-    id: 'kids-sale-1',
-    name: 'Colorful Graphic T-Shirt',
-    brand: 'KidsJoy',
-    image: 'https://images.unsplash.com/photo-1503944583220-79d8926ad5e2?auto=format&fit=crop&w=800&q=80',
-    price: 32,
-    salePrice: 21,
-    discount: 34,
-    rating: 4.6,
-    reviews: 89,
-    category: 'kids',
-    colors: ['blue', 'red', 'green', 'yellow'],
-    sizes: ['4Y', '6Y', '8Y', '10Y', '12Y']
-  },
+  
   {
     id: 'kids-sale-2',
     name: 'Adventure Cargo Shorts',
@@ -152,20 +100,7 @@ export const accessoriesSaleProducts = [
     colors: ['white', 'black', 'gray'],
     sizes: ['6', '7', '8', '9', '10', '11']
   },
-  {
-    id: 'accessories-sale-2',
-    name: 'Classic Leather Belt',
-    brand: 'BuckleUp',
-    image: 'https://images.unsplash.com/photo-1618160702438-9b02ab6515c9?auto=format&fit=crop&w=800&q=80',
-    price: 45,
-    salePrice: 29,
-    discount: 36,
-    rating: 4.7,
-    reviewCount: 57,
-    category: 'accessories',
-    colors: ['brown', 'black', 'tan'],
-    sizes: ['S', 'M', 'L', 'XL']
-  },
+  
   {
     id: 'accessories-sale-3',
     name: 'Summer Straw Hat',
@@ -205,7 +140,7 @@ export const salesProducts = [
 ];
 
 // Helper function to get sale products by category
-export const getSaleProductsByCategory = (category: string) => {
+export const getSaleProductsByCategory = (category) => {
   switch (category) {
     case 'men':
       return menSaleProducts;

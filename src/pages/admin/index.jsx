@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTheme } from '@/contexts/ThemeContext';
 import { useAuth } from '@/contexts/AuthContext';
+import { useScrollToTop } from '@/utils/scrollToTop';
 import  Button  from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -10,6 +11,7 @@ import {
   Package,
   Users,
   Tag,
+  FolderOpen,
   Menu,
   Moon,
   Sun,
@@ -34,8 +36,10 @@ import CouponManagement from './components/CouponManagement';
 import UsersManagement from './components/UsersManagement';
 import Dashboard from './components/Dashboard';
 import AccountManagement from './components/AccountManagement';
+import CategoryManagement from './components/CategoryManagement';
 
 const AdminPage = () => {
+  useScrollToTop();
   const navigate = useNavigate();
   const { theme, toggleTheme } = useTheme();
   const { logout, user } = useAuth();
@@ -67,6 +71,7 @@ const AdminPage = () => {
   const sidebarItems = [
     { id: 'dashboard', label: 'Dashboard', icon: BarChart3 },
     { id: 'products', label: 'Products', icon: Package },
+    { id: 'categories', label: 'Categories', icon: FolderOpen },
     { id: 'coupons', label: 'Coupons', icon: Tag },
     { id: 'users', label: 'Users', icon: Users },
     { id: 'account', label: 'Account', icon: User },
@@ -229,6 +234,7 @@ const AdminPage = () => {
         <div className="p-6" key={animationKey}>
           {activeTab === 'dashboard' && <Dashboard stats={stats} />}
           {activeTab === 'products' && <ProductManagement />}
+          {activeTab === 'categories' && <CategoryManagement />}
           {activeTab === 'coupons' && <CouponManagement />}
           {activeTab === 'users' && <UsersManagement />}
           {activeTab === 'account' && <AccountManagement />}

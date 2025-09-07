@@ -40,7 +40,7 @@ import {
   Package,
   Eye
 } from 'lucide-react';
-import { productAPI, categoryAPI } from '@/lib/api';
+import { productAPI, categoryAPI, specificationAPI } from '@/lib/api';
 import { useAuth } from '@/contexts/AuthContext';
 import { toast } from '@/hooks/use-toast';
 import { normalProducts, salesProducts, newArrivalProducts } from '@/data/products';
@@ -59,6 +59,7 @@ const ProductManagement = () => {
   const [imagePreview, setImagePreview] = useState('');
   const [categories, setCategories] = useState([]);
   const [formErrors, setFormErrors] = useState({});
+  const [isSubmitting, setIsSubmitting] = useState(false);
   
   const [formData, setFormData] = useState({
     name: '',
@@ -67,14 +68,19 @@ const ProductManagement = () => {
     category_id: '',
     stock: '',
     image: '',
-    sizes: [],
-    colors: [],
     featured: false,
     sale_price: ''
   });
 
-  const sizes = ['XS', 'S', 'M', 'L', 'XL', 'XXL'];
-  const colors = ['Black', 'White', 'Red', 'Blue', 'Green', 'Yellow', 'Pink', 'Gray'];
+  const [specifications, setSpecifications] = useState([]);
+  const [newSpec, setNewSpec] = useState({ name: '', value: '', price: '' });
+
+  const commonSpecTypes = {
+    'Size': ['XS', 'S', 'M', 'L', 'XL', 'XXL'],
+    'Color': ['Black', 'White', 'Red', 'Blue', 'Green', 'Yellow', 'Pink', 'Gray'],
+    'Material': ['Cotton', 'Polyester', 'Wool', 'Silk', 'Denim', 'Leather'],
+    'Brand': ['Nike', 'Adidas', 'Zara', 'H&M', 'Uniqlo']
+  };
 
   useEffect(() => {
     fetchProducts();
@@ -89,8 +95,20 @@ const ProductManagement = () => {
     try {
       setLoading(true);
       const response = await productAPI.getAll();
-      setProducts(response.data || []);
-      setFilteredProducts(response.data || []);
+      // Fetch specifications for each product
+      const productsWithSpecs = await Promise.all(
+        (response.data || []).map(async (product) => {
+          try {
+            const specsResponse = await specificationAPI.getAll();
+            const productSpecs = specsResponse.data?.filter(spec => spec.product_id === product.id) || [];
+            return { ...product, specifications: productSpecs };
+          } catch (error) {
+            return { ...product, specifications: [] };
+          }
+        })
+      );
+      setProducts(productsWithSpecs);
+      setFilteredProducts(productsWithSpecs);
     } catch (error) {
       console.error('Failed to fetch products:', error);
       // Fallback to mock data if API fails
@@ -172,22 +190,38 @@ const ProductManagement = () => {
     }));
   };
 
-  const handleSizeToggle = (size) => {
-    setFormData(prev => ({
-      ...prev,
-      sizes: prev.sizes.includes(size)
-        ? prev.sizes.filter(s => s !== size)
-        : [...prev.sizes, size]
-    }));
+  const handleAddSpecification = () => {
+    if (!newSpec.name || !newSpec.value) {
+      toast({
+        title: "Validation Error",
+        description: "Specification name and value are required",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    const spec = {
+      ...newSpec,
+      price: parseFloat(newSpec.price) || 0,
+      id: Date.now() // Temporary ID for new specs
+    };
+
+    setSpecifications(prev => [...prev, spec]);
+    setNewSpec({ name: '', value: '', price: '' });
   };
 
-  const handleColorToggle = (color) => {
-    setFormData(prev => ({
-      ...prev,
-      colors: prev.colors.includes(color)
-        ? prev.colors.filter(c => c !== color)
-        : [...prev.colors, color]
-    }));
+  const handleRemoveSpecification = (index) => {
+    setSpecifications(prev => prev.filter((_, i) => i !== index));
+  };
+
+  const handleQuickAddSpec = (type, value) => {
+    const spec = {
+      name: type,
+      value: value,
+      price: 0,
+      id: Date.now()
+    };
+    setSpecifications(prev => [...prev, spec]);
   };
 
   const handleImageUpload = (e) => {
@@ -226,6 +260,8 @@ const ProductManagement = () => {
   };
 
   const handleAddProduct = async () => {
+    if (isSubmitting) return; // Prevent multiple submissions
+    
     if (!validateForm()) {
       const errorMessages = Object.values(formErrors).join('. ');
       toast({
@@ -236,6 +272,7 @@ const ProductManagement = () => {
       return;
     }
 
+    setIsSubmitting(true);
     try {
       const productData = {
         name: formData.name,
@@ -245,10 +282,22 @@ const ProductManagement = () => {
         description: formData.description || null
       };
 
-      await productAPI.create(productData);
+      const productResponse = await productAPI.create(productData);
+      const productId = productResponse.data.id;
+
+      // Create specifications for the new product
+      for (const spec of specifications) {
+        await specificationAPI.create({
+          product_id: productId,
+          name: spec.name,
+          value: spec.value,
+          price: spec.price
+        });
+      }
+
       toast({
         title: "Success",
-        description: "Product added successfully",
+        description: "Product and specifications added successfully",
       });
       setIsAddModalOpen(false);
       resetForm();
@@ -261,10 +310,14 @@ const ProductManagement = () => {
         description: errorMessage,
         variant: "destructive",
       });
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
   const handleEditProduct = async () => {
+    if (isSubmitting) return; // Prevent multiple submissions
+    
     if (!validateForm()) {
       const errorMessages = Object.values(formErrors).join('. ');
       toast({
@@ -275,6 +328,7 @@ const ProductManagement = () => {
       return;
     }
 
+    setIsSubmitting(true);
     try {
       const productData = {
         name: formData.name,
@@ -285,9 +339,26 @@ const ProductManagement = () => {
       };
 
       await productAPI.update(selectedProduct.id, productData);
+
+      // Delete existing specifications
+      const existingSpecs = selectedProduct.specifications || [];
+      for (const spec of existingSpecs) {
+        await specificationAPI.delete(spec.id);
+      }
+
+      // Create new specifications
+      for (const spec of specifications) {
+        await specificationAPI.create({
+          product_id: selectedProduct.id,
+          name: spec.name,
+          value: spec.value,
+          price: spec.price
+        });
+      }
+
       toast({
         title: "Success",
-        description: "Product updated successfully",
+        description: "Product and specifications updated successfully",
       });
       setIsEditModalOpen(false);
       resetForm();
@@ -300,6 +371,8 @@ const ProductManagement = () => {
         description: errorMessage,
         variant: "destructive",
       });
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -332,11 +405,10 @@ const ProductManagement = () => {
       category_id: product.category_id || product.category?.id || '',
       stock: product.stock || '',
       image: product.image || '',
-      sizes: product.sizes || [],
-      colors: product.colors || [],
       featured: product.featured || false,
       sale_price: product.sale_price || ''
     });
+    setSpecifications(product.specifications || []);
     setImagePreview(product.image);
     setFormErrors({});
     setIsEditModalOpen(true);
@@ -350,14 +422,15 @@ const ProductManagement = () => {
       category_id: '',
       stock: '',
       image: '',
-      sizes: [],
-      colors: [],
       featured: false,
       sale_price: ''
     });
+    setSpecifications([]);
+    setNewSpec({ name: '', value: '', price: '' });
     setImagePreview('');
     setSelectedProduct(null);
     setFormErrors({});
+    setIsSubmitting(false);
   };
 
   if (loading) {
@@ -413,18 +486,22 @@ const ProductManagement = () => {
               formData={formData}
               imagePreview={imagePreview}
               categories={categories}
-              sizes={sizes}
-              colors={colors}
+              specifications={specifications}
+              newSpec={newSpec}
+              setNewSpec={setNewSpec}
+              commonSpecTypes={commonSpecTypes}
               handleInputChange={handleInputChange}
               handleImageUpload={handleImageUpload}
-              handleSizeToggle={handleSizeToggle}
-              handleColorToggle={handleColorToggle}
+              handleAddSpecification={handleAddSpecification}
+              handleRemoveSpecification={handleRemoveSpecification}
+              handleQuickAddSpec={handleQuickAddSpec}
               onSubmit={handleAddProduct}
               onCancel={() => {
                 setIsAddModalOpen(false);
                 resetForm();
               }}
               formErrors={formErrors}
+              isSubmitting={isSubmitting}
             />
           </DialogContent>
         </Dialog>
@@ -527,12 +604,15 @@ const ProductManagement = () => {
             formData={formData}
             imagePreview={imagePreview}
             categories={categories}
-            sizes={sizes}
-            colors={colors}
+            specifications={specifications}
+            newSpec={newSpec}
+            setNewSpec={setNewSpec}
+            commonSpecTypes={commonSpecTypes}
             handleInputChange={handleInputChange}
             handleImageUpload={handleImageUpload}
-            handleSizeToggle={handleSizeToggle}
-            handleColorToggle={handleColorToggle}
+            handleAddSpecification={handleAddSpecification}
+            handleRemoveSpecification={handleRemoveSpecification}
+            handleQuickAddSpec={handleQuickAddSpec}
             onSubmit={handleEditProduct}
             onCancel={() => {
               setIsEditModalOpen(false);
@@ -540,6 +620,7 @@ const ProductManagement = () => {
             }}
             isEdit
             formErrors={formErrors}
+            isSubmitting={isSubmitting}
           />
         </DialogContent>
       </Dialog>
@@ -571,16 +652,20 @@ const ProductForm = ({
   formData,
   imagePreview,
   categories,
-  sizes,
-  colors,
+  specifications,
+  newSpec,
+  setNewSpec,
+  commonSpecTypes,
   handleInputChange,
   handleImageUpload,
-  handleSizeToggle,
-  handleColorToggle,
+  handleAddSpecification,
+  handleRemoveSpecification,
+  handleQuickAddSpec,
   onSubmit,
   onCancel,
   isEdit = false,
-  formErrors = {}
+  formErrors = {},
+  isSubmitting = false
 }) => {
   return (
     <div className="space-y-6">
@@ -685,44 +770,102 @@ const ProductForm = ({
         </div>
       </div>
 
-      <div className="space-y-2">
-        <Label>Available Sizes</Label>
-        <div className="flex flex-wrap  gap-2 mt-2">
-          {sizes.map(size => (
-            <button
-              key={size}
+      {/* Product Specifications Section */}
+      <div className="space-y-4 border-t pt-4">
+        <Label className="text-lg font-semibold">Product Specifications</Label>
+        
+        {/* Add New Specification */}
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-3 p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
+          <div className="space-y-2">
+            <Label htmlFor="spec-name">Specification Name</Label>
+            <Input
+              id="spec-name"
+              value={newSpec.name}
+              onChange={(e) => setNewSpec(prev => ({ ...prev, name: e.target.value }))}
+              placeholder="e.g., Size, Color, Material"
+            />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="spec-value">Value</Label>
+            <Input
+              id="spec-value"
+              value={newSpec.value}
+              onChange={(e) => setNewSpec(prev => ({ ...prev, value: e.target.value }))}
+              placeholder="e.g., Large, Red, Cotton"
+            />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="spec-price">Additional Price</Label>
+            <Input
+              id="spec-price"
+              type="number"
+              step="0.01"
+              min="0"
+              value={newSpec.price}
+              onChange={(e) => setNewSpec(prev => ({ ...prev, price: e.target.value }))}
+              placeholder="0.00"
+            />
+          </div>
+          <div className="flex items-end">
+            <Button
               type="button"
-              onClick={() => handleSizeToggle(size)}
-              className={`px-3 py-1 rounded-md border transition-colors ${
-                formData.sizes.includes(size)
-                  ? 'bg-primary text-primary-foreground border-primary'
-                  : 'bg-background hover:bg-accent'
-              }`}
+              onClick={handleAddSpecification}
+              className="w-full bg-green-600 hover:bg-green-700"
             >
-              {size}
-            </button>
-          ))}
+              <Plus className="h-4 w-4 mr-1" />
+              Add Spec
+            </Button>
+          </div>
         </div>
-      </div>
 
-      <div className="space-y-2">
-        <Label>Available Colors</Label>
-        <div className="flex flex-wrap gap-2 mt-2">
-          {colors.map(color => (
-            <button
-              key={color}
-              type="button"
-              onClick={() => handleColorToggle(color)}
-              className={`px-3 py-1  rounded-md border transition-colors ${
-                formData.colors.includes(color)
-                  ? 'bg-primary text-primary-foreground border-primary'
-                  : 'bg-background hover:bg-accent'
-              }`}
-            >
-              {color}
-            </button>
+        {/* Quick Add Common Specifications */}
+        <div className="space-y-3">
+          {Object.entries(commonSpecTypes).map(([type, values]) => (
+            <div key={type} className="space-y-2">
+              <Label className="text-sm font-medium">{type}</Label>
+              <div className="flex flex-wrap gap-2">
+                {values.map(value => (
+                  <button
+                    key={`${type}-${value}`}
+                    type="button"
+                    onClick={() => handleQuickAddSpec(type, value)}
+                    className="px-3 py-1 text-sm rounded-md border bg-background hover:bg-accent transition-colors"
+                  >
+                    {value}
+                  </button>
+                ))}
+              </div>
+            </div>
           ))}
         </div>
+
+        {/* Current Specifications List */}
+        {specifications.length > 0 && (
+          <div className="space-y-2">
+            <Label className="text-sm font-medium">Current Specifications</Label>
+            <div className="space-y-2 max-h-40 overflow-y-auto">
+              {specifications.map((spec, index) => (
+                <div key={index} className="flex items-center justify-between p-3 bg-white dark:bg-gray-700 rounded-lg border">
+                  <div className="flex-1">
+                    <span className="font-medium">{spec.name}:</span>
+                    <span className="ml-2">{spec.value}</span>
+                    {spec.price > 0 && (
+                      <span className="ml-2 text-green-600 font-medium">+${spec.price}</span>
+                    )}
+                  </div>
+                  <Button
+                    type="button"
+                    variant="destructive"
+                    size="sm"
+                    onClick={() => handleRemoveSpecification(index)}
+                  >
+                    <X className="h-4 w-4" />
+                  </Button>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
       </div>
 
       <div className="space-y-2">
@@ -762,11 +905,27 @@ const ProductForm = ({
       </div>
 
       <div className="flex gap-3 justify-end">
-        <Button variant="outline" onClick={onCancel} className="border-orange-200 dark:border-gray-700 hover:bg-orange-100/50 dark:hover:bg-gray-800/50">
+        <Button 
+          variant="outline" 
+          onClick={onCancel} 
+          className="border-orange-200 dark:border-gray-700 hover:bg-orange-100/50 dark:hover:bg-gray-800/50"
+          disabled={isSubmitting}
+        >
           Cancel
         </Button>
-        <Button onClick={onSubmit} className="bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-white shadow-lg">
-          {isEdit ? 'Update Product' : 'Add Product'}
+        <Button 
+          onClick={onSubmit} 
+          className="bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-white shadow-lg"
+          disabled={isSubmitting}
+        >
+          {isSubmitting ? (
+            <>
+              <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin mr-2"></div>
+              {isEdit ? 'Updating...' : 'Adding...'}
+            </>
+          ) : (
+            isEdit ? 'Update Product' : 'Add Product'
+          )}
         </Button>
       </div>
     </div>

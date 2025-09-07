@@ -57,7 +57,7 @@ export const authAPI = {
     const response = await api.post('/login', credentials);
     if (response.data?.data?.token) {
       Cookies.set('token', response.data.data.token);
-      // Store user data in localStorage for chat
+      // Store user data in localStorage
       if (response.data?.data?.user) {
         const user = {
           id: response.data.data.user.id,
@@ -492,8 +492,11 @@ export const couponAPI = {
   },
 
   // Apply coupon
-  apply: async (code) => {
-    const response = await api.post('/coupons/apply', { code });
+  apply: async (code, purchaseAmount) => {
+    const response = await api.post('/coupons/apply', { 
+      code, 
+      purchase_amount: purchaseAmount 
+    });
     return response.data;
   }
 };
@@ -504,6 +507,13 @@ export const specificationAPI = {
   getAll: async () => {
     const response = await api.get('/specifications');
     return response.data;
+  },
+
+  // Get specifications by product ID
+  getByProductId: async (productId) => {
+    const response = await api.get('/specifications');
+    const specifications = response.data.data || [];
+    return specifications.filter(spec => spec.product_id === parseInt(productId));
   },
 
   // Get single specification

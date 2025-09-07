@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useCart } from '@/contexts/CartContext';
 import { Trash2, Plus, Minus, ShoppingBag, Tag, X } from 'lucide-react';
@@ -83,16 +82,16 @@ const CartPage = () => {
                   <div className="flex items-center gap-4 text-sm">
                     <div className="flex items-center gap-2">
                       <span className="text-muted-foreground">Size:</span>
-                      <span className="bg-muted px-2 py-1 rounded text-xs font-medium">{item.size}</span>
+                      <span className="bg-muted px-2 py-1 rounded text-xs font-medium">{item.size || 'N/A'}</span>
                     </div>
                     <div className="flex items-center gap-2">
                       <span className="text-muted-foreground">Color:</span>
                       <div className="flex items-center gap-1">
                         <div 
                           className="w-4 h-4 rounded-full border border-border"
-                          style={{ backgroundColor: item.color.toLowerCase() }}
+                          style={{ backgroundColor: item.color?.toLowerCase() || '#gray' }}
                         />
-                        <span className="capitalize text-xs font-medium">{item.color}</span>
+                        <span className="capitalize text-xs font-medium">{item.color || 'N/A'}</span>
                       </div>
                     </div>
                   </div>
@@ -154,8 +153,9 @@ const CartPage = () => {
                       className="flex-1"
                     />
                     <Button
-                      onClick={() => {
-                        if (applyCoupon(couponCode)) {
+                      onClick={async () => {
+                        const success = await applyCoupon(couponCode);
+                        if (success) {
                           setCouponCode('');
                           setCouponError('');
                         } else {
@@ -174,7 +174,7 @@ const CartPage = () => {
                     <p className="text-sm text-red-500">{couponError}</p>
                   )}
                   <p className="text-xs text-muted-foreground">
-                    Try: SAVE10, SAVE20, SAVE50, WELCOME15
+                    Enter your coupon code to get discount
                   </p>
                 </div>
               ) : (
@@ -205,7 +205,7 @@ const CartPage = () => {
               {coupon && getDiscountAmount() > 0 && (
                 <div className="flex justify-between text-sm">
                   <span className="text-green-600">
-                    Discount ({coupon.type === 'percentage' ? `${coupon.value}%` : `$${coupon.value}`})
+                    Discount ({coupon.discount_type === 'percentage' ? `${coupon.discount_value}%` : `$${coupon.discount_value}`})
                   </span>
                   <span className="font-medium text-green-600">
                     -${getDiscountAmount().toFixed(2)}

@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useCart } from '@/contexts/CartContext';
 import { useNavigate } from 'react-router-dom';
@@ -39,12 +38,12 @@ const CheckoutPage = () => {
 
   const [isProcessing, setIsProcessing] = useState(false);
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setIsProcessing(true);
 
@@ -329,7 +328,7 @@ const CheckoutPage = () => {
               {coupon && discountAmount > 0 && (
                 <div className="flex justify-between text-sm">
                   <span className="text-green-600">
-                    Discount ({coupon.type === 'percentage' ? `${coupon.value}%` : `$${coupon.value}`})
+                    Discount ({coupon.discount_type === 'percentage' ? `${coupon.discount_value}%` : `$${coupon.discount_value}`})
                   </span>
                   <span className="text-green-600">-${discountAmount.toFixed(2)}</span>
                 </div>
