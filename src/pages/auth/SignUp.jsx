@@ -1,13 +1,15 @@
 import React, { useEffect, useState } from "react";
-import { useScrollToTop } from "../../utils/scrollToTop";
-import { Link, useNavigate } from "react-router-dom";
-import Cookies from "js-cookie"
+import { useAuth } from '@/contexts/AuthContext';
+import { Link, useNavigate } from 'react-router-dom';
+// import { toast } from '@/hooks/use-toast';
+import { Eye, EyeOff } from 'lucide-react';
+import { Spinner } from '@/components/ui/spinner';
 import Button from "@/components/ui/Button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Mail, User, ArrowRight, Github, Eye, EyeOff, CloudCog, Check, X } from "lucide-react";
+import { Mail, User, ArrowRight, Github,  CloudCog, Check, X } from "lucide-react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { ToastContainer, toast } from 'react-toastify';
@@ -307,7 +309,7 @@ const SignUp = () => {
                   >
                     {isLoading ? (
                       <span className="flex items-center">
-                        <span className="animate-spin mr-2">◌</span>
+                        <Spinner size={16} className="mr-2" />
                         Creating Account...
                       </span>
                     ) : (

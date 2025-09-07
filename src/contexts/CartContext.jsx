@@ -4,6 +4,7 @@ import { couponAPI } from '@/lib/api';
 const CartContext = createContext(undefined);
 
 export const CartProvider = ({ children }) => {
+  
   const [cartItems, setCartItems] = useState(() => {
     const saved = localStorage.getItem('cart');
     return saved ? JSON.parse(saved) : [];

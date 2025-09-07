@@ -8,6 +8,7 @@ import { useToast } from '@/hooks/use-toast';
 import Icon from '@/components/AppIcon';
 import Button from '@/components/ui/Button';
 import { toast } from 'react-toastify';
+import { Spinner } from '@/components/ui/spinner';
 import { productAPI } from '@/lib/api';
 import { getLatestProducts, formatProductsForDisplay } from '@/utils/productUtils';
 
@@ -103,18 +104,8 @@ const FeaturedProducts = () => {
  
         {/* Loading State */}
         {loading && (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-10">
-            {[...Array(4)].map((_, index) => (
-              <div key={index} className="bg-white rounded-3xl overflow-hidden shadow-xl animate-pulse">
-                <div className="aspect-square bg-gray-200"></div>
-                <div className="p-6 space-y-4">
-                  <div className="h-4 bg-gray-200 rounded w-3/4"></div>
-                  <div className="h-6 bg-gray-200 rounded w-full"></div>
-                  <div className="h-4 bg-gray-200 rounded w-1/2"></div>
-                  <div className="h-10 bg-gray-200 rounded w-full"></div>
-                </div>
-              </div>
-            ))}
+          <div className="flex justify-center items-center py-20">
+            <Spinner size="lg" />
           </div>
         )}
 

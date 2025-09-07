@@ -1,16 +1,17 @@
 import React, { useState, useEffect } from "react";
 import { useSwipeable } from "react-swipeable";
 import { ChevronLeft, ChevronRight, Pause, Play } from "lucide-react";
+import { Link } from "react-router-dom";
 
 const banners = [
   {
     id: 1,
-    title: "Summer Collection 2025",
+    title: "Summer Collection 2025 For Women",
     subtitle: "Fresh styles for the season",
-    description: "Discover our latest summer arrivals with up to 40% off.",
+    description: "Discover our latest summer arrivals.",
     image: "https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=1200&h=600&fit=crop",
     cta: "Shop Summer",
-    ctaLink: "#",
+    ctaLink: "/category/women",
   },
   {
     id: 2,
@@ -19,7 +20,7 @@ const banners = [
     description: "Be the first to wear the latest trends from top brands.",
     image: "https://images.pexels.com/photos/1926769/pexels-photo-1926769.jpeg?w=1200&h=600&fit=crop",
     cta: "Explore New",
-    ctaLink: "#",
+    ctaLink: "/category/new-arrivals",
   },
   {
     id: 3,
@@ -28,7 +29,7 @@ const banners = [
     description: "Shop for the whole family and save big with our bundle deals.",
     image: "https://images.unsplash.com/photo-1526170375885-4d8ecf77b99f?w=1200&h=600&fit=crop",
     cta: "Shop Family",
-    ctaLink: "#",
+    ctaLink: "/category/sale",
   },
 ];
 
@@ -61,6 +62,13 @@ const HeroSection = () => {
     trackMouse: true,
   });
 
+  const handleSlideClick = (e) => {
+    // Prevent slide navigation when clicking on CTA button
+    if (e.target.closest('a')) {
+      return;
+    }
+  };
+
   return (
     <div
       {...swipeHandlers}
@@ -68,38 +76,49 @@ const HeroSection = () => {
     >
       {/* Slides */}
       <div className="relative w-full h-full">
-        {banners.map((banner, index) => (
-          <div
-            key={banner.id}
-            className={`absolute inset-0 transition-opacity duration-700 ease-in-out ${
-              index === currentSlide ? "opacity-100" : "opacity-0"
-            }`}
-          >
-            <img
-              src={banner.image}
-              alt={banner.title}
-              className="w-full h-full object-cover"
-            />
-            <div className="absolute inset-0 bg-gradient-to-r from-black/50 to-black/30" />
-            <div className="absolute inset-0 flex flex-col justify-center items-center text-center text-white px-4 animate-fade-in">
-              <p className="text-sm font-medium mb-2 animate-fade-in">
-                {banner.subtitle}
-              </p>
-              <h1 className="text-3xl md:text-5xl font-bold mb-4 animate-fade-in">
-                {banner.title}
-              </h1>
-              <p className="text-base md:text-lg mb-6 max-w-md animate-fade-in">
-                {banner.description}
-              </p>
-              <a
-                href={banner.ctaLink}
-                className="px-6 py-3  bg-gradient-to-r from-orange-500 to-amber-500 text-white rounded-full text-sm font-bold shadow-lg font-medium hover:scale-105 transition-transform duration-300 animate-fade-in"
-              >
-                {banner.cta}
-              </a>
+{banners.map((banner, index) => {
+          const isActive = index === currentSlide;
+          return (
+            <div
+              key={banner.id}
+              className={`absolute inset-0 transition-opacity duration-700 ease-in-out ${
+                isActive ? "opacity-100 z-10" : "opacity-0 z-0"
+              }`}
+              onClick={handleSlideClick}
+              style={{ pointerEvents: isActive ? 'auto' : 'none' }}
+            >
+              <img
+                src={banner.image}
+                alt={banner.title}
+                className="w-full h-full object-cover"
+              />
+              <div className="absolute inset-0 bg-gradient-to-r from-black/50 to-black/30" />
+              <div className="absolute inset-0 flex flex-col justify-center items-center text-center text-white px-4 animate-fade-in">
+                <p className="text-sm font-medium mb-2 animate-fade-in">
+                  {banner.subtitle}
+                </p>
+                <h1 className="text-3xl md:text-5xl font-bold mb-4 animate-fade-in">
+                  {banner.title}
+                </h1>
+                <p className="text-base md:text-lg mb-6 max-w-md animate-fade-in">
+                  {banner.description}
+                </p>
+                {isActive && (
+                  <Link
+                    to={banner.ctaLink}
+                    className="px-6 py-3 bg-gradient-to-r from-orange-500 to-amber-500 text-white rounded-full text-sm font-bold shadow-lg font-medium hover:scale-105 transition-transform duration-300 animate-fade-in inline-block"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                     
+                    }}
+                  >
+                    {banner.cta}
+                  </Link>
+                )}
+              </div>
             </div>
-          </div>
-        ))}
+          );
+        })}
       </div>
 
       {/* Arrows */}

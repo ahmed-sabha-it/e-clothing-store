@@ -6,7 +6,8 @@ import { Button } from '@/components/ui/Button1';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Separator } from '@/components/ui/separator';
-import { CreditCard, MapPin, User, Mail, Phone, Lock } from 'lucide-react';
+import { Lock, CreditCard, MapPin, User, Mail, Phone } from 'lucide-react';
+import { Spinner } from '@/components/ui/spinner';
 import { useScrollToTop } from '../utils/scrollToTop';
 
 const CheckoutPage = () => {
@@ -276,7 +277,7 @@ const CheckoutPage = () => {
             >
               {isProcessing ? (
                 <>
-                  <Lock className="h-4 w-4 mr-2 animate-spin" />
+                  <Spinner size={16} className="mr-2" />
                   Processing...
                 </>
               ) : (

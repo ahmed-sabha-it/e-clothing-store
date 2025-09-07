@@ -8,6 +8,7 @@ import { useCart } from '@/contexts/CartContext';
 import { useToast } from '@/hooks/use-toast';
 import { Filter, X, Search } from 'lucide-react';
 import { useScrollToTop } from '../utils/scrollToTop';
+import { Spinner } from '@/components/ui/spinner';
 import { productAPI } from '@/lib/api';
 import { formatProductsForDisplay } from '@/utils/productUtils';
 
@@ -292,18 +293,8 @@ const SearchPage = () => {
 
           {/* Loading State */}
           {loading && (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
-              {[...Array(8)].map((_, index) => (
-                <div key={index} className="bg-white dark:bg-gray-800 rounded-2xl overflow-hidden shadow-lg animate-pulse">
-                  <div className="aspect-square bg-gray-200 dark:bg-gray-700"></div>
-                  <div className="p-6 space-y-4">
-                    <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-3/4"></div>
-                    <div className="h-6 bg-gray-200 dark:bg-gray-700 rounded w-full"></div>
-                    <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-1/2"></div>
-                    <div className="h-10 bg-gray-200 dark:bg-gray-700 rounded w-full"></div>
-                  </div>
-                </div>
-              ))}
+            <div className="flex justify-center items-center py-20">
+              <Spinner size="lg" />
             </div>
           )}
 

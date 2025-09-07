@@ -1,16 +1,17 @@
 import React, { useEffect, useState } from "react";
 import { useScrollToTop } from "../../utils/scrollToTop";
-import { Link, useNavigate } from "react-router-dom";
-import { useAuth } from "../../contexts/AuthContext";
+import { useAuth } from '@/contexts/AuthContext';
+import { Link, useNavigate } from 'react-router-dom';
+import { Eye, EyeOff } from 'lucide-react';
+import { Spinner } from '@/components/ui/spinner';
 import Button from "@/components/ui/Button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Mail, ArrowRight, Github, Eye, EyeOff } from "lucide-react";
+import { Mail, ArrowRight, Github } from "lucide-react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
-// import { useToast } from "@/components/ui/use-toast";
 import { toast } from "react-toastify";
 import { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider } from "@/components/ui/tooltip";
 import PageTitle from "@/components/PageTitle";
@@ -157,7 +158,7 @@ const SignIn = () => {
                   >
                     {isLoading ? (
                       <span className="flex items-center">
-                        <span className="animate-spin mr-2">◌</span>
+                        <Spinner size={16} className="mr-2" />
                         Signing In...
                       </span>
                     ) : (

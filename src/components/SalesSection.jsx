@@ -8,16 +8,6 @@ import { getProductsByCategory } from '@/data/products';
 const SalesSection = () => {
   const salesProducts = getProductsByCategory('sale');
 
-  const LoadingSkeleton = () => (
-    <div className="bg-white rounded-3xl overflow-hidden shadow-xl">
-      <div className="aspect-[3/4] bg-gradient-to-br from-red-200 to-orange-200 animate-pulse" />
-      <div className="p-6 space-y-4">
-        <div className="h-3 bg-gray-200 rounded-full animate-pulse" />
-        <div className="h-4 bg-gray-200 rounded-full animate-pulse w-3/4" />
-        <div className="h-5 bg-gray-200 rounded-full animate-pulse w-1/2" />
-      </div>
-    </div>
-  );
 
   return (
     <section className="py-24 bg-gradient-to-br from-orange-50 via-amber-50 to-yellow-50 dark:from-gray-800 dark:via-gray-900 dark:to-black relative overflow-hidden">

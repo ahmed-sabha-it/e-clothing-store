@@ -8,6 +8,7 @@ import { productAPI, specificationAPI, reviewAPI } from '@/lib/api';
 import { formatProductForDisplay } from '@/utils/productUtils';
 import { useCart } from '@/contexts/CartContext';
 import { useWishlist } from '@/contexts/WishlistContext';
+import { Spinner } from '@/components/ui/spinner';
 import { useToast } from '@/hooks/use-toast';
 import useScrollToTop from '../utils/scrollToTop'
 const ProductDetail = () => {
@@ -301,30 +302,8 @@ const ProductDetail = () => {
   if (loading) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-orange-50 via-amber-50 to-yellow-50 dark:from-gray-800 dark:via-gray-900 dark:to-black">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
-            {/* Image Skeleton */}
-            <div className="space-y-4">
-              <div className="aspect-square bg-gray-200 rounded-3xl animate-pulse"></div>
-              <div className="flex gap-4">
-                {[...Array(4)].map((_, i) => (
-                  <div key={i} className="w-20 h-20 bg-gray-200 rounded-xl animate-pulse"></div>
-                ))}
-              </div>
-            </div>
-            
-            {/* Content Skeleton */}
-            <div className="space-y-6">
-              <div className="h-8 bg-gray-200 rounded w-3/4 animate-pulse"></div>
-              <div className="h-12 bg-gray-200 rounded w-1/2 animate-pulse"></div>
-              <div className="space-y-2">
-                <div className="h-4 bg-gray-200 rounded animate-pulse"></div>
-                <div className="h-4 bg-gray-200 rounded w-5/6 animate-pulse"></div>
-                <div className="h-4 bg-gray-200 rounded w-4/6 animate-pulse"></div>
-              </div>
-              <div className="h-16 bg-gray-200 rounded animate-pulse"></div>
-            </div>
-          </div>
+        <div className="flex justify-center items-center min-h-screen">
+          <Spinner size="lg" />
         </div>
       </div>
     );
@@ -661,19 +640,8 @@ const ProductDetail = () => {
             </h2>
             
             {reviewsLoading ? (
-              <div className="space-y-4">
-                {[...Array(3)].map((_, i) => (
-                  <div key={i} className="animate-pulse">
-                    <div className="flex items-center gap-4 mb-2">
-                      <div className="w-10 h-10 bg-gray-200 rounded-full"></div>
-                      <div className="flex-1">
-                        <div className="h-4 bg-gray-200 rounded w-1/4 mb-1"></div>
-                        <div className="h-3 bg-gray-200 rounded w-1/6"></div>
-                      </div>
-                    </div>
-                    <div className="h-4 bg-gray-200 rounded w-3/4"></div>
-                  </div>
-                ))}
+              <div className="flex justify-center items-center py-8">
+                <Spinner size="md" />
               </div>
             ) : reviews.length > 0 ? (
               <div className="space-y-6">

@@ -244,41 +244,47 @@ const CategoryManagement = () => {
 
       {/* Categories Grid */}
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-        {filteredCategories.map((category) => (
-          <Card key={category.id} className="hover:shadow-md dark:bg-gray-800 transition-shadow">
-            <CardHeader className="pb-3">
-              <div className="flex items-center justify-between">
-                <CardTitle className=" text-lg">{category.name}</CardTitle>
-                <div className="flex  gap-2">
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => openEditModal(category)}
-                    className="dark:bg-orange-700"
-                  >
-                    <Edit className="h-4  w-4" />
-                  </Button>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => setDeleteCategoryId(category.id)}
-                    className="dark:bg-red-700"
-                  >
-                    <Trash2 className="h-4 w-4" />
-                  </Button>
+        {loading ? (
+          <div className="flex items-center justify-center py-12">
+            <Spinner size="md" />
+          </div>
+        ) : (
+          filteredCategories.map((category) => (
+            <Card key={category.id} className="hover:shadow-md dark:bg-gray-800 transition-shadow">
+              <CardHeader className="pb-3">
+                <div className="flex items-center justify-between">
+                  <CardTitle className=" text-lg">{category.name}</CardTitle>
+                  <div className="flex gap-2">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => openEditModal(category)}
+                      className="dark:bg-orange-700"
+                    >
+                      <Edit className="h-4 w-4" />
+                    </Button>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setDeleteCategoryId(category.id)}
+                      className="dark:bg-red-700"
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
+                  </div>
                 </div>
-              </div>
-            </CardHeader>
-            <CardContent>
-              <div className="text-sm text-muted-foreground">
-                <p>ID: {category.id}</p>
-                {category.created_at && (
-                  <p>Created: {new Date(category.created_at).toLocaleDateString()}</p>
-                )}
-              </div>
-            </CardContent>
-          </Card>
-        ))}
+              </CardHeader>
+              <CardContent>
+                <div className="text-sm text-muted-foreground">
+                  <p>ID: {category.id}</p>
+                  {category.created_at && (
+                    <p>Created: {new Date(category.created_at).toLocaleDateString()}</p>
+                  )}
+                </div>
+              </CardContent>
+            </Card>
+          ))
+        )}
       </div>
 
       {filteredCategories.length === 0 && (

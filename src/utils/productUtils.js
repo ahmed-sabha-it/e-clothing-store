@@ -92,14 +92,6 @@ export const formatProductsForDisplay = (products) => {
   return products.map(formatProductForDisplay).filter(Boolean);
 };
 
-/**
- * Check if product is considered "new" (created within last 30 days)
- * @param {string} createdAt - Product creation date
- * @returns {boolean} - True if product is new
- */
-export const isNewProduct = (createdAt) => {
-  return isProductCreatedWithinDays(createdAt, 30);
-};
 
 /**
  * Filter products by category

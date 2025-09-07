@@ -4,6 +4,7 @@ import  Button  from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
+import { Spinner } from '@/components/ui/spinner';
 import {
   Select,
   SelectContent,
@@ -436,7 +437,7 @@ const ProductManagement = () => {
   if (loading) {
     return (
       <div className="flex items-center justify-center py-12">
-        <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
+        <Spinner size="lg" />
       </div>
     );
   }
@@ -920,7 +921,7 @@ const ProductForm = ({
         >
           {isSubmitting ? (
             <>
-              <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin mr-2"></div>
+              <Spinner size="sm" className="mr-2" />
               {isEdit ? 'Updating...' : 'Adding...'}
             </>
           ) : (

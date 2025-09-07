@@ -21,7 +21,7 @@ const Footer = () => {
         { name: "Order History", href: "/order-confirmation" },
         { name: "Wishlist", href: "/wishlist" },
         // { name: "Track Order", href: "#" },
-        { name: "Log In", href: "#" }
+        
       ]
     },
     {

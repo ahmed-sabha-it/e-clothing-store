@@ -5,20 +5,11 @@ import Button from '@/components/ui/Button';
 import Image from '@/components/AppImage';
 import EnhancedProductCard from '@/components/EnhancedProductCard';
 import { getProductsByCategory } from '@/data/products';
+import { Spinner } from '@/components/ui/spinner';
 
 const AccessoriesSection = ({ loading = false }) => {
   const accessories = getProductsByCategory('accessories').slice(0, 4);
 
-  const LoadingSkeleton = () => (
-    <div className="bg-white rounded-3xl overflow-hidden shadow-xl">
-      <div className="aspect-square bg-gradient-to-br from-gray-200 to-gray-300 animate-pulse" />
-      <div className="p-8 space-y-4">
-        <div className="h-3 bg-gray-200 rounded-full animate-pulse" />
-        <div className="h-4 bg-gray-200 rounded-full animate-pulse w-3/4" />
-        <div className="h-5 bg-gray-200 rounded-full animate-pulse w-1/2" />
-      </div>
-    </div>
-  );
 
   return (
     <section className="py-24 bg-gradient-to-br from-orange-50 via-amber-50 to-yellow-50 dark:from-gray-800 dark:via-gray-900 dark:to-black relative overflow-hidden">
@@ -62,10 +53,9 @@ const AccessoriesSection = ({ loading = false }) => {
         {/* Enhanced Accessories Grid */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-10">
           {loading ? (
-            // Loading Skeletons
-            Array.from({ length: 4 }).map((_, index) => (
-              <LoadingSkeleton key={index} />
-            ))
+            <div className="col-span-full flex justify-center items-center py-20">
+              <Spinner size="lg" />
+            </div>
           ) : (
             // Enhanced Accessory Cards using EnhancedProductCard
             accessories?.map((accessory, index) => (

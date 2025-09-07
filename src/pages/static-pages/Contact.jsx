@@ -1,12 +1,13 @@
 import React, { useState } from "react";
-import { useScrollToTop } from "../../utils/scrollToTop";
+import { toast } from "@/hooks/use-toast";
+import { Send, Mail, Phone, MapPin } from "lucide-react";
 import Button from "@/components/ui/Button";
+import { Spinner } from "@/components/ui/spinner";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Mail, Phone, MapPin, Send } from "lucide-react";
-import { toast } from "react-toastify";
+import { useScrollToTop } from "@/utils/scrollToTop";
 
 const Contact = () => {
   useScrollToTop();
@@ -126,7 +127,7 @@ const Contact = () => {
                   >
                     {loading ? (
                       <div className="flex items-center gap-2">
-                        <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                        <Spinner size={16} variant="white" />
                         Sending...
                       </div>
                     ) : (

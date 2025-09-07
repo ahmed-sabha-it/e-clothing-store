@@ -5,6 +5,7 @@ import { useCart } from '@/contexts/CartContext';
 import { useWishlist } from '@/contexts/WishlistContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { useTheme } from '@/contexts/ThemeContext';
+import { toast } from '@/hooks/use-toast';
 import Logo from '@/components/Logo';
 import  Button  from '@/components/ui/Button';
 const Header = () => {
@@ -33,6 +34,28 @@ const Header = () => {
       navigate(`/search?q=${encodeURIComponent(searchQuery.trim())}`);
     } else {
       navigate('/search');
+    }
+  };
+
+  const handleCartClick = (e) => {
+    if (!isAuthenticated) {
+      e.preventDefault();
+      toast({
+        title: "Authentication Required",
+        description: "Please sign in to access your cart.",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleWishlistClick = (e) => {
+    if (!isAuthenticated) {
+      e.preventDefault();
+      toast({
+        title: "Authentication Required",
+        description: "Please sign in to access your wishlist.",
+        variant: "destructive",
+      });
     }
   };
 
@@ -94,10 +117,11 @@ const Header = () => {
             {/* Wishlist */}
             <Link
               to="/wishlist"
+              onClick={handleWishlistClick}
               className="p-2 rounded-lg hover:bg-muted transition-colors duration-200 relative"
             >
               <Heart className="h-5 w-5 text-foreground" />
-              {wishlistItems.length > 0 && (
+              {isAuthenticated && wishlistItems.length > 0 && (
                 <span className="absolute -top-1 -right-1 bg-orange-gradient text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
                   {wishlistItems.length}
                 </span>
@@ -107,10 +131,11 @@ const Header = () => {
             {/* Cart */}
             <Link
               to="/cart"
+              onClick={handleCartClick}
               className="p-2 rounded-lg hover:bg-muted transition-colors duration-200 relative"
             >
               <ShoppingCart className="h-5 w-5 text-foreground" />
-              {getTotalItems() > 0 && (
+              {isAuthenticated && getTotalItems() > 0 && (
                 <span className="absolute -top-1 -right-1 bg-orange-gradient text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
                   {getTotalItems()}
                 </span>
