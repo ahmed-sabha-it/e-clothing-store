@@ -6,7 +6,7 @@ import { useScrollToTop } from '@/utils/scrollToTop';
 import  Button  from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
+import { Sheet, SheetContent, SheetTrigger, SheetTitle, SheetDescription, SheetHeader } from '@/components/ui/sheet';
 import {
   Package,
   Users,
@@ -29,14 +29,15 @@ import {
   TrendingUp,
   Eye,
   X,
-  User
+  User,
+  Lock
 } from 'lucide-react';
 import ProductManagement from './components/ProductManagement';
 import CouponManagement from './components/CouponManagement';
 import UsersManagement from './components/UsersManagement';
 import Dashboard from './components/Dashboard';
-import AccountManagement from './components/AccountManagement';
 import CategoryManagement from './components/CategoryManagement';
+import AccountManagement from './components/AccountManagement';
 
 const AdminPage = () => {
   useScrollToTop();
@@ -74,7 +75,7 @@ const AdminPage = () => {
     { id: 'categories', label: 'Categories', icon: FolderOpen },
     { id: 'coupons', label: 'Coupons', icon: Tag },
     { id: 'users', label: 'Users', icon: Users },
-    { id: 'account', label: 'Account', icon: User },
+    { id: 'account', label: 'Account Management', icon: User },
   ];
 
   const stats = [
@@ -95,11 +96,11 @@ const AdminPage = () => {
             </Button>
           </SheetTrigger>
           <SheetContent side="left" className="bg-gradient-to-br from-orange-50 via-amber-50 to-yellow-50 dark:from-gray-800 dark:via-gray-900 dark:to-black border-r border-orange-200/50 dark:border-gray-700/50">
+            <SheetHeader className="sr-only">
+              <SheetTitle>Admin Navigation Menu</SheetTitle>
+              <SheetDescription>Navigate through different admin sections</SheetDescription>
+            </SheetHeader>
             <div className="flex flex-col h-full">
-              <div className="sr-only">
-                <h2>Admin Navigation Menu</h2>
-                <p>Navigate through different admin sections</p>
-              </div>
               <div className="mb-8 pb-6 border-b border-orange-200/50 dark:border-gray-700/50 animate-fade-in animation-delay-150">
                 <h2 className="text-2xl font-bold bg-gradient-to-r from-orange-500 to-amber-500 bg-clip-text text-transparent">
                   Admin Panel

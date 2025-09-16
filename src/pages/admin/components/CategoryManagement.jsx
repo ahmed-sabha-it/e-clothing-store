@@ -13,7 +13,7 @@ import { categoryAPI } from '@/lib/api';
 const CategoryManagement = () => {
   const { toast } = useToast();
   const { user } = useAuth();
-  
+  const [loading,setLoading]=useState(null);
   const [categories, setCategories] = useState([]);
   const [filteredCategories, setFilteredCategories] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');

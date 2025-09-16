@@ -15,7 +15,7 @@ const ProductDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const { addToCart } = useCart();
-  const { addToWishlist, removeFromWishlist, isInWishlist } = useWishlist();
+  const { toggleWishlist, isProductWishlisted } = useWishlist();
   const { toast } = useToast();
 
   const [product, setProduct] = useState(null);
@@ -251,44 +251,43 @@ const ProductDetail = () => {
       }
     }
 
+    // Pass the product with selected specifications to CartContext
+    // CartContext will handle server API calls for authenticated users
     addToCart({
       id: product.id,
       name: product.name,
       price: product.price,
       image: product.image,
-      specifications: selectedSpecifications,
+      specifications: selectedSpecifications, // This contains the full spec objects with IDs
       quantity: quantity,
-      category: product.category
+      category: product.category,
+      // For backwards compatibility with local cart (guests)
+      size: selectedSpecifications.size?.value,
+      color: selectedSpecifications.color?.value
     });
 
-    toast({
-      title: "Added to cart",
-      description: `${product.name} has been added to your cart.`,
-    });
+    // Success toast is now handled by CartContext
   };
 
   const handleWishlistToggle = () => {
     if (!product) return;
 
-    if (isInWishlist(product.id.toString())) {
-      removeFromWishlist(product.id.toString());
-      toast({
-        title: "Removed from wishlist",
-        description: `${product.name} has been removed from your wishlist.`,
-      });
-    } else {
-      addToWishlist({
-        id: product.id.toString(),
-        name: product.name,
-        price: product.price,
-        image: product.image,
-        category: product.category,
-      });
-      toast({
-        title: "Added to wishlist",
-        description: `${product.name} has been added to your wishlist.`,
-      });
-    }
+    // Pass product with selected specifications to WishlistContext
+    // For authenticated users, it will use selected specs or fallback to first spec (Option B)
+    // For guests, it will use the local wishlist
+    toggleWishlist({
+      id: product.id,
+      name: product.name,
+      price: product.price,
+      image: product.image,
+      category: product.category,
+      specifications: selectedSpecifications, // This contains the full spec objects with IDs
+      // For backwards compatibility with local wishlist (guests)
+      size: selectedSpecifications.size?.value,
+      color: selectedSpecifications.color?.value
+    });
+
+    // Success/error toasts are now handled by WishlistContext
   };
 
   const formatPrice = (price) => {
@@ -397,7 +396,7 @@ const ProductDetail = () => {
                   name="Heart" 
                   size={20} 
                   className={`transition-colors ${
-                    isInWishlist(product.id.toString()) 
+                    isProductWishlisted(product.id) 
                       ? 'text-red-500 fill-current' 
                       : 'text-gray-700 hover:text-red-500'
                   }`}
@@ -622,9 +621,9 @@ const ProductDetail = () => {
                   <Icon 
                     name="Heart" 
                     size={16} 
-                    className={`mr-2 ${isInWishlist(product.id.toString()) ? 'fill-current' : ''}`} 
+                    className={`mr-2 ${isProductWishlisted(product.id) ? 'fill-current' : ''}`} 
                   />
-                  {isInWishlist(product.id.toString()) ? 'Remove from Wishlist' : 'Add to Wishlist'}
+                  {isProductWishlisted(product.id) ? 'Remove from Wishlist' : 'Add to Wishlist'}
                 </Button>
               </div>
             </div>

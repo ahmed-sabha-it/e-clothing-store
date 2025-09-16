@@ -9,20 +9,35 @@ const LoyaltyCard = ({ loyaltyData }) => {
   const getTierColor = (tier) => {
     switch (tier.toLowerCase()) {
       case 'bronze':
-        return 'text-yellow-600';
+        return 'text-amber-600';
       case 'silver':
-        return 'text-gray-500';
+        return 'text-gray-400';
       case 'gold':
-        return 'text-yellow-500';
+        return 'text-yellow-400';
       case 'platinum':
-        return 'text-purple-500';
+        return 'text-purple-300';
       default:
-        return 'text-muted-foreground';
+        return 'text-white';
+    }
+  };
+
+  const getTierGradient = (tier) => {
+    switch (tier.toLowerCase()) {
+      case 'bronze':
+        return 'from-amber-600 to-orange-700';
+      case 'silver':
+        return 'from-gray-400 to-gray-600';
+      case 'gold':
+        return 'from-yellow-400 to-amber-500';
+      case 'platinum':
+        return 'from-purple-500 to-indigo-600';
+      default:
+        return 'from-orange-500 to-amber-500';
     }
   };
 
   return (
-    <div className="bg-gradient-to-r from-orange-500 to-amber-500 text-white rounded-lg p-6 mb-6 animate-fade-in animation-delay-300">
+    <div className={`bg-gradient-to-r ${getTierGradient(tier)} text-white rounded-lg p-6 mb-6 animate-fade-in animation-delay-300`}>
       <div className="flex items-center justify-between mb-4">
         <div>
           <h3 className="text-lg font-semibold">Loyalty Status</h3>

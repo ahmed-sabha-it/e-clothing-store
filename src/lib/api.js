@@ -153,6 +153,12 @@ export const userAPI = {
     return response.data;
   },
 
+  // Change password
+  changePassword: async (passwordData) => {
+    const response = await api.put('/user/password', passwordData);
+    return response.data;
+  },
+
   // Get user balance
   getBalance: async () => {
     const response = await api.get('/user/balance');
@@ -181,6 +187,27 @@ export const userAPI = {
   getWishlist: async () => {
     const response = await api.get('/user/wishlist');
     return response.data;
+  },
+
+  // Admin user management functions
+  admin: {
+    // Get all users (admin only)
+    getAllUsers: async () => {
+      const response = await api.get('/admin/users');
+      return response.data;
+    },
+
+    // Update user (admin only)
+    updateUser: async (id, userData) => {
+      const response = await api.put(`/admin/users/${id}`, userData);
+      return response.data;
+    },
+
+    // Delete user (admin only)
+    deleteUser: async (id) => {
+      const response = await api.delete(`/admin/users/${id}`);
+      return response.data;
+    }
   }
 };
 

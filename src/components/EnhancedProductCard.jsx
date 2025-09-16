@@ -7,7 +7,7 @@ import { useCart } from '@/contexts/CartContext';
 import { useToast } from '@/hooks/use-toast';
 
 const EnhancedProductCard = ({ product, index = 0 }) => {
-  const { addToWishlist, removeFromWishlist, isInWishlist } = useWishlist();
+  const { toggleWishlist, isProductWishlisted } = useWishlist();
   const { addToCart } = useCart();
   const { toast } = useToast();
   
@@ -22,37 +22,42 @@ const EnhancedProductCard = ({ product, index = 0 }) => {
     e.preventDefault();
     e.stopPropagation();
     
-    if (isInWishlist(product.id.toString())) {
-      removeFromWishlist(product.id.toString());
-    } else {
-      addToWishlist({
-        id: product.id.toString(),
-        name: product.name,
-        price: product.price,
-        image: product.image,
-        category: product.category || product.brand || 'Product',
-      });
-    }
+    // Pass product info to WishlistContext
+    // For authenticated users, WishlistContext will fetch specifications and use the first one (Option B)
+    // For guests, it will use the local wishlist with default values
+    toggleWishlist({
+      id: product.id,
+      name: product.name,
+      price: product.price,
+      image: product.image,
+      category: product.category || product.brand || 'Product',
+      // For backwards compatibility with local wishlist (guests)
+      size: product.sizes?.[0] || 'Default',
+      color: product.colors?.[0] || 'Default',
+    });
+
+    // Success/error toasts are now handled by WishlistContext
   };
 
   const handleAddToCart = (e) => {
     e.preventDefault();
     e.stopPropagation();
     
+    // Pass product info to CartContext
+    // For authenticated users, CartContext will fetch specifications and use the first one
+    // For guests, it will use the local cart with default values
     addToCart({
       id: product.id,
       name: product.name,
       price: product.price,
       image: product.image,
-      size: product.sizes[0],
-      color: product.colors[0],
-      category: product.category
+      category: product.category,
+      // For backwards compatibility with local cart (guests)
+      size: product.sizes?.[0] || 'Default',
+      color: product.colors?.[0] || 'Default',
     });
 
-    toast({
-      title: "Added to cart",
-      description: `${product.name} has been added to your cart.`,
-    });
+    // Success toast is now handled by CartContext
   };
 
   // Default gradient if not provided
@@ -105,7 +110,7 @@ const EnhancedProductCard = ({ product, index = 0 }) => {
             name="Heart" 
             size={20} 
             className={`transition-colors ${
-              isInWishlist(product.id.toString()) 
+              isProductWishlisted(product.id) 
                 ? 'text-red-500 fill-current' 
                 : 'text-gray-700 hover:text-red-500'
             }`}
@@ -140,7 +145,10 @@ const EnhancedProductCard = ({ product, index = 0 }) => {
             ))}
           </div>
           <span className="text-sm text-gray-500 font-medium">
-            ({product?.reviewCount || product?.reviews || 0})
+            <span className="mr-1">{product?.rating || 0}</span>
+            {product?.reviewCount > 0 && (
+              <span>({product.reviewCount})</span>
+            )}
           </span>
         </div>
 

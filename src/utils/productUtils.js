@@ -104,7 +104,7 @@ export const getProductsByCategory = (products, categoryName) => {
   if (!categoryName || categoryName === 'all') return products;
   
   const normalizedCategory = categoryName.toLowerCase();
-  
+   
   return products.filter(product => {
     const productCategory = product.category?.toLowerCase() || '';
     

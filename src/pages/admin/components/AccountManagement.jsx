@@ -20,25 +20,13 @@ import {
   CheckCircle,
   XCircle
 } from 'lucide-react';
+import ChangePassword from './ChangePassword';
 
 const AccountManagement = () => {
   const navigate = useNavigate();
   const { user, logout, updatePassword, deleteAccount } = useAuth();
   const { theme } = useTheme();
   
-  // Password change state
-  const [passwordData, setPasswordData] = useState({
-    currentPassword: '',
-    newPassword: '',
-    confirmPassword: ''
-  });
-  const [showPasswords, setShowPasswords] = useState({
-    current: false,
-    new: false,
-    confirm: false
-  });
-  const [passwordLoading, setPasswordLoading] = useState(false);
-  const [passwordMessage, setPasswordMessage] = useState({ type: '', text: '' });
 
   // Delete account state
   const [deleteConfirmation, setDeleteConfirmation] = useState('');
@@ -49,45 +37,6 @@ const AccountManagement = () => {
   const [logoutLoading, setLogoutLoading] = useState(false);
   const [logoutDialogOpen, setLogoutDialogOpen] = useState(false);
 
-  const handlePasswordChange = async (e) => {
-    e.preventDefault();
-    setPasswordLoading(true);
-    setPasswordMessage({ type: '', text: '' });
-
-    // Validation
-    if (!passwordData.currentPassword || !passwordData.newPassword || !passwordData.confirmPassword) {
-      setPasswordMessage({ type: 'error', text: 'All password fields are required' });
-      setPasswordLoading(false);
-      return;
-    }
-
-    if (passwordData.newPassword !== passwordData.confirmPassword) {
-      setPasswordMessage({ type: 'error', text: 'New passwords do not match' });
-      setPasswordLoading(false);
-      return;
-    }
-
-    if (passwordData.newPassword.length < 8) {
-      setPasswordMessage({ type: 'error', text: 'New password must be at least 8 characters long' });
-      setPasswordLoading(false);
-      return;
-    }
-
-    try {
-      // TODO: Replace with actual API call when backend is ready
-      // await updatePassword(passwordData.currentPassword, passwordData.newPassword);
-      
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1500));
-      
-      setPasswordMessage({ type: 'success', text: 'Password updated successfully' });
-      setPasswordData({ currentPassword: '', newPassword: '', confirmPassword: '' });
-    } catch (error) {
-      setPasswordMessage({ type: 'error', text: error.message || 'Failed to update password' });
-    } finally {
-      setPasswordLoading(false);
-    }
-  };
 
   const handleLogout = async () => {
     setLogoutLoading(true);
@@ -126,12 +75,6 @@ const AccountManagement = () => {
     }
   };
 
-  const togglePasswordVisibility = (field) => {
-    setShowPasswords(prev => ({
-      ...prev,
-      [field]: !prev[field]
-    }));
-  };
 
   return (
     <div className="space-y-6 animate-fade-in">
@@ -185,100 +128,10 @@ const AccountManagement = () => {
           </CardContent>
         </Card> */}
 
-        {/* Change Password */}
-        <Card className="animate-fade-in dark:bg-gray-800 col-span-2 animation-delay-300">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Lock className="h-5 w-5 text-orange-500" />
-              Change Password
-            </CardTitle>
-            <CardDescription>
-              Update your account password for better security
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <form onSubmit={handlePasswordChange} className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="currentPassword">Current Password</Label>
-                <div className="relative">
-                  <Input
-                    id="currentPassword"
-                    type={showPasswords.current ? 'text' : 'password'}
-                    value={passwordData.currentPassword}
-                    onChange={(e) => setPasswordData(prev => ({ ...prev, currentPassword: e.target.value }))}
-                    className="pr-10"
-                    required
-                  />
-                  <button
-                    type="button"
-                    onClick={() => togglePasswordVisibility('current')}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
-                  >
-                    {showPasswords.current ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                  </button>
-                </div>
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="newPassword">New Password</Label>
-                <div className="relative">
-                  <Input
-                    id="newPassword"
-                    type={showPasswords.new ? 'text' : 'password'}
-                    value={passwordData.newPassword}
-                    onChange={(e) => setPasswordData(prev => ({ ...prev, newPassword: e.target.value }))}
-                    className="pr-10"
-                    required
-                  />
-                  <button
-                    type="button"
-                    onClick={() => togglePasswordVisibility('new')}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
-                  >
-                    {showPasswords.new ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                  </button>
-                </div>
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="confirmPassword">Confirm New Password</Label>
-                <div className="relative">
-                  <Input
-                    id="confirmPassword"
-                    type={showPasswords.confirm ? 'text' : 'password'}
-                    value={passwordData.confirmPassword}
-                    onChange={(e) => setPasswordData(prev => ({ ...prev, confirmPassword: e.target.value }))}
-                    className="pr-10"
-                    required
-                  />
-                  <button
-                    type="button"
-                    onClick={() => togglePasswordVisibility('confirm')}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
-                  >
-                    {showPasswords.confirm ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                  </button>
-                </div>
-              </div>
-
-              {passwordMessage.text && (
-                <Alert className={passwordMessage.type === 'error' ? 'border-red-200 bg-red-50 dark:border-red-800 dark:bg-red-950' : 'border-green-200 bg-green-50 dark:border-green-800 dark:bg-green-950'}>
-                  <AlertDescription className={passwordMessage.type === 'error' ? 'text-red-800 dark:text-red-200' : 'text-green-800 dark:text-green-200'}>
-                    {passwordMessage.text}
-                  </AlertDescription>
-                </Alert>
-              )}
-
-              <Button
-                type="submit"
-                disabled={passwordLoading}
-                className="w-full bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600"
-              >
-                {passwordLoading ? 'Updating...' : 'Update Password'}
-              </Button>
-            </form>
-          </CardContent>
-        </Card>
+        {/* Change Password Component */}
+        <div className="col-span-2">
+          <ChangePassword />
+        </div>
       </div>
 
       {/* Account Actions */}

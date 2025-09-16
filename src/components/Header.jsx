@@ -7,7 +7,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useTheme } from '@/contexts/ThemeContext';
 import { toast } from '@/hooks/use-toast';
 import Logo from '@/components/Logo';
-import  Button  from '@/components/ui/Button';
+import Button from '@/components/ui/Button';
 const Header = () => {
   const { isDark, toggleTheme } = useTheme();
   const { getTotalItems } = useCart();
@@ -37,27 +37,7 @@ const Header = () => {
     }
   };
 
-  const handleCartClick = (e) => {
-    if (!isAuthenticated) {
-      e.preventDefault();
-      toast({
-        title: "Authentication Required",
-        description: "Please sign in to access your cart.",
-        variant: "destructive",
-      });
-    }
-  };
-
-  const handleWishlistClick = (e) => {
-    if (!isAuthenticated) {
-      e.preventDefault();
-      toast({
-        title: "Authentication Required",
-        description: "Please sign in to access your wishlist.",
-        variant: "destructive",
-      });
-    }
-  };
+  // Remove cart and wishlist click handlers - allow guest access
 
   // Don't render header for admin users
   if (isAuthenticated && (user?.is_admin || user?.role === 'admin')) {
@@ -117,11 +97,10 @@ const Header = () => {
             {/* Wishlist */}
             <Link
               to="/wishlist"
-              onClick={handleWishlistClick}
               className="p-2 rounded-lg hover:bg-muted transition-colors duration-200 relative"
             >
               <Heart className="h-5 w-5 text-foreground" />
-              {isAuthenticated && wishlistItems.length > 0 && (
+              {wishlistItems.length > 0 && (
                 <span className="absolute -top-1 -right-1 bg-orange-gradient text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
                   {wishlistItems.length}
                 </span>
@@ -131,11 +110,10 @@ const Header = () => {
             {/* Cart */}
             <Link
               to="/cart"
-              onClick={handleCartClick}
               className="p-2 rounded-lg hover:bg-muted transition-colors duration-200 relative"
             >
               <ShoppingCart className="h-5 w-5 text-foreground" />
-              {isAuthenticated && getTotalItems() > 0 && (
+              {getTotalItems() > 0 && (
                 <span className="absolute -top-1 -right-1 bg-orange-gradient text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
                   {getTotalItems()}
                 </span>
@@ -152,9 +130,7 @@ const Header = () => {
               ) : (
                 <Link to="/signin">
                   <Button 
-                    variant="gradient" 
-                    iconName="LogIn" 
-                    iconSize={16}
+                    variant="primary" 
                     className="px-6 py-3 bg-gradient-to-r from-orange-500 to-amber-500 text-white rounded text-sm font-bold shadow-lg font-medium hover:scale-105 transition-transform duration-300"
                   >
                     Log In

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { authAPI, userAPI } from '../../lib/api';
+import { authAPI, userAPI, orderAPI } from '../../lib/api';
 import { useAuth } from '../../contexts/AuthContext';
 import { useScrollToTop } from '../../utils/scrollToTop';
 // import Header from '../../components/ui/Header';
@@ -38,11 +38,11 @@ const UserProfileManagement = () => {
     gender: ''
   });
 
-  const [loyaltyData] = useState({
+  const [loyaltyData, setLoyaltyData] = useState({
     tier: 'Gold',
     points: 2450,
     nextTierPoints: 5000,
-    totalSpent: 1250,
+    totalSpent: 0,
     benefits: [
       'Free shipping on all orders',
       'Early access to sales',
@@ -79,80 +79,7 @@ const UserProfileManagement = () => {
     }
   ]);
 
-  const [orders] = useState([
-    {
-      id: 'ORD-2024-001',
-      date: '2024-01-15T10:30:00Z',
-      status: 'Delivered',
-      total: 129.99,
-      subtotal: 109.99,
-      shipping: 0,
-      tax: 20.00,
-      discount: 0,
-      items: [
-        {
-          name: 'Classic Cotton T-Shirt',
-          image: 'https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=300&h=300&fit=crop',
-          size: 'M',
-          color: 'Navy',
-          quantity: 2,
-          price: 29.99
-        },
-        {
-          name: 'Denim Jeans',
-          image: 'https://images.unsplash.com/photo-1542272604-787c3835535d?w=300&h=300&fit=crop',
-          size: '32',
-          color: 'Blue',
-          quantity: 1,
-          price: 79.99
-        }
-      ],
-      shippingAddress: {
-        name: 'John Doe',
-        street: '123 Main Street, Apt 4B',
-        city: 'New York',
-        state: 'NY',
-        zipCode: '10001',
-        country: 'United States'
-      },
-      paymentMethod: {
-        type: 'Visa',
-        last4: '4242'
-      }
-    },
-    {
-      id: 'ORD-2024-002',
-      date: '2024-01-10T14:20:00Z',
-      status: 'Shipped',
-      total: 89.99,
-      subtotal: 74.99,
-      shipping: 0,
-      tax: 15.00,
-      discount: 0,
-      items: [
-        {
-          name: 'Summer Dress',
-          image: 'https://images.unsplash.com/photo-1595777457583-95e059d581b8?w=300&h=300&fit=crop',
-          size: 'S',
-          color: 'Floral',
-          quantity: 1,
-          price: 74.99
-        }
-      ],
-      shippingAddress: {
-        name: 'John Doe',
-        street: '123 Main Street, Apt 4B',
-        city: 'New York',
-        state: 'NY',
-        zipCode: '10001',
-        country: 'United States'
-      },
-      paymentMethod: {
-        type: 'Mastercard',
-        last4: '8888'
-      }
-    }
-  ]);
+  const [orders, setOrders] = useState([]);
 
   // const [wishlistItems, setWishlistItems] = useState([
   //   {
@@ -236,15 +163,16 @@ const UserProfileManagement = () => {
     { id: 'preferences', label: 'Settings', icon: 'Settings' }
   ];
 
-  // Fetch user profile data from API
+  // Fetch user profile data and orders from API
   useEffect(() => {
-    const fetchUserProfile = async () => {
+    const fetchUserData = async () => {
       try {
         setLoading(true);
         setError(null);
         
-        const response = await userAPI.getProfile();
-        const user = response.data || response.user || response;
+        // Fetch user profile
+        const profileResponse = await userAPI.getProfile();
+        const user = profileResponse.data || profileResponse.user || profileResponse;
         
         setUserData({
           name: user.name || '',
@@ -256,6 +184,65 @@ const UserProfileManagement = () => {
           dateOfBirth: user.date_of_birth || user.dateOfBirth || '',
           gender: user.gender || ''
         });
+
+        // Fetch user orders
+        try {
+          const ordersResponse = await orderAPI.getAll();
+          const ordersData = ordersResponse.data || ordersResponse.orders || ordersResponse;
+          
+          // Transform backend order data to match frontend format
+          const transformedOrders = Array.isArray(ordersData) ? ordersData.map(order => ({
+            id: order.id,
+            date: order.created_at,
+            status: order.status || 'pending',
+            total: parseFloat(order.total_price || 0),
+            subtotal: parseFloat(order.total_price || 0),
+            shipping: 0,
+            tax: 0,
+            discount: 0,
+            items: order.order_specifications?.map(spec => ({
+              name: spec.specification?.product?.name || 'Product',
+              image: spec.specification?.product?.image || '/placeholder.svg',
+              size: spec.specification?.name === 'Size' ? spec.specification?.value : 'N/A',
+              color: spec.specification?.name === 'Color' ? spec.specification?.value : 'N/A',
+              quantity: spec.quantity || 1,
+              price: parseFloat(spec.specification?.price || 0)
+            })) || [],
+            shippingAddress: {
+              name: user.name || 'User',
+              street: order.address_description || 'N/A',
+              city: 'N/A',
+              state: 'N/A',
+              zipCode: 'N/A',
+              country: 'N/A'
+            },
+            paymentMethod: {
+              type: 'N/A',
+              last4: 'N/A'
+            }
+          })) : [];
+          
+          setOrders(transformedOrders);
+          
+          // Calculate total spent from actual orders
+          const totalSpent = transformedOrders.reduce((sum, order) => sum + order.total, 0);
+          
+          // Update loyalty data with real spending
+          setLoyaltyData(prev => ({
+            ...prev,
+            totalSpent: totalSpent,
+            // Calculate tier based on spending
+            tier: totalSpent >= 2000 ? 'Platinum' : totalSpent >= 1000 ? 'Gold' : totalSpent >= 500 ? 'Silver' : 'Bronze',
+            // Calculate points (1 point per dollar spent)
+            points: Math.floor(totalSpent),
+            nextTierPoints: totalSpent >= 2000 ? 5000 : totalSpent >= 1000 ? 2000 : totalSpent >= 500 ? 1000 : 500
+          }));
+          
+        } catch (orderErr) {
+          console.error('Error fetching orders:', orderErr);
+          // Don't fail the entire profile load if orders fail
+          setOrders([]);
+        }
         
       } catch (err) {
         console.error('Error fetching user profile:', err);
@@ -265,7 +252,7 @@ const UserProfileManagement = () => {
       }
     };
 
-    fetchUserProfile();
+    fetchUserData();
   }, []);
 
   // Handle URL parameters for tab switching

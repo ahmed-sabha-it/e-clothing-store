@@ -125,7 +125,10 @@ const SalesCard = ({ product, index = 0 }) => {
             ))}
           </div>
           <span className="text-sm text-gray-500 font-medium">
-            ({product?.reviews || 0})
+            <span className="mr-1">{product?.rating || 0}</span>
+            {product?.reviewCount > 0 && (
+              <span>({product.reviewCount})</span>
+            )}
           </span>
         </div>
 

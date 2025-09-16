@@ -1,8 +1,8 @@
-
 import React, { useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { getProductById } from '@/data/products';
 import { useCart } from '@/contexts/CartContext';
+import { useWishlist } from '@/contexts/WishlistContext';
 import { useToast } from '@/hooks/use-toast';
 import { useScrollToTop } from '../utils/scrollToTop';
 
@@ -11,31 +11,31 @@ const ProductPage = () => {
   const { id } = useParams();
   const product = getProductById(id || '');
   const { addToCart } = useCart();
+  const { toggleWishlist, isProductWishlisted } = useWishlist();
   const { toast } = useToast();
   
   const [selectedSize, setSelectedSize] = useState('');
   const [selectedColor, setSelectedColor] = useState('');
 
   const handleAddToCart = () => {
-    if (!product) return;
-    
-    const size = selectedSize || product.sizes[0];
-    const color = selectedColor || product.colors[0];
+    // Pass product info to CartContext
+    // For authenticated users, CartContext will fetch specifications and use the first one
+    // For guests, it will use the local cart with default values
+    const size = selectedSize || product.sizes?.[0] || 'Default';
+    const color = selectedColor || product.colors?.[0] || 'Default';
     
     addToCart({
       id: product.id,
       name: product.name,
       price: product.price,
       image: product.image,
+      category: product.category,
+      // For backwards compatibility with local cart (guests)
       size,
       color,
-      category: product.category
     });
 
-    toast({
-      title: "Added to cart",
-      description: `${product.name} has been added to your cart.`,
-    });
+    // Success toast is now handled by CartContext
   };
 
   if (!product) {

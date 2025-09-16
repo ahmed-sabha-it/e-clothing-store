@@ -71,11 +71,7 @@ const UsersManagement = () => {
   const [deleteUserId, setDeleteUserId] = useState(null);
   
   const [editFormData, setEditFormData] = useState({
-    name: '',
-    email: '',
-    phone: '',
     role: 'customer',
-    status: 'active',
     balance: 0
   });
 
@@ -90,85 +86,19 @@ const UsersManagement = () => {
   const fetchUsers = async () => {
     try {
       setLoading(true);
-      // Mock data for demonstration
-      const mockUsers = [
-        {
-          id: 1,
-          name: 'John Doe',
-          email: 'john.doe@example.com',
-          phone: '+963 996-944-873',
-          role: 'customer',
-          // status: 'active',
-          balance: 250.00,
-          total_orders: 15,
-          total_spent: 1250.00,
-          joined_date: '2023-06-15',
-          last_login: '2024-01-15',
-          address: 'banias-Syria'
-        },
-        {
-          id: 2,
-          name: 'Jane Smith',
-          email: 'jane.smith@example.com',
-          phone: '+1 234 567 8901',
-          role: 'admin',
-          // status: 'active',
-          balance: 0,
-          total_orders: 0,
-          total_spent: 0,
-          joined_date: '2023-01-10',
-          last_login: '2024-01-15',
-          address: '456 Oak Ave, Los Angeles, CA 90001'
-        },
-        {
-          id: 3,
-          name: 'Bob Johnson',
-          email: 'bob.johnson@example.com',
-          phone: '+1 234 567 8902',
-          role: 'customer',
-          // status: 'inactive',
-          balance: 50.00,
-          total_orders: 8,
-          total_spent: 650.00,
-          joined_date: '2023-09-20',
-          last_login: '2023-12-01',
-          address: '789 Pine Rd, Chicago, IL 60601'
-        },
-        {
-          id: 4,
-          name: 'Alice Brown',
-          email: 'alice.brown@example.com',
-          phone: '+1 234 567 8903',
-          role: 'customer',
-          // status: 'active',
-          balance: 125.75,
-          total_orders: 22,
-          total_spent: 2150.00,
-          joined_date: '2023-03-05',
-          last_login: '2024-01-14',
-          address: '321 Elm St, Houston, TX 77001'
-        },
-        // {
-        //   id: 5,
-        //   name: 'Charlie Wilson',
-        //   email: 'charlie.wilson@example.com',
-        //   phone: '+1 234 567 8904',
-        //   role: 'customer',
-        //   status: 'suspended',
-        //   balance: 0,
-        //   total_orders: 3,
-        //   total_spent: 150.00,
-        //   joined_date: '2023-11-10',
-        //   last_login: '2023-12-20',
-        //   address: '654 Maple Dr, Phoenix, AZ 85001'
-        // }
-      ];
-      setUsers(mockUsers);
-      setFilteredUsers(mockUsers);
+      const response = await userAPI.admin.getAllUsers();
+      
+      if (response.status && response.data) {
+        setUsers(response.data);
+        setFilteredUsers(response.data);
+      } else {
+        throw new Error(response.message || 'Failed to fetch users');
+      }
     } catch (error) {
+      console.error('Error fetching users:', error);
       toast({
         title: "Error",
-        description: "Failed to fetch users",
+        description: error.response?.data?.message || "Failed to fetch users",
         variant: "destructive",
       });
     } finally {
@@ -188,7 +118,10 @@ const UsersManagement = () => {
     }
     
     if (roleFilter !== 'all') {
-      filtered = filtered.filter(user => user.role === roleFilter);
+      filtered = filtered.filter(user => {
+        const userRole = user.is_admin ? 'admin' : user.role;
+        return userRole === roleFilter;
+      });
     }
     
     if (statusFilter !== 'all') {
@@ -214,9 +147,7 @@ const UsersManagement = () => {
   const handleEditUser = (user) => {
     setSelectedUser(user);
     setEditFormData({
-      
-      role: user.role,
-      // status: user.status,
+      role: user.is_admin ? 'admin' : user.role,
       balance: user.balance
     });
     setIsEditModalOpen(true);
@@ -224,23 +155,31 @@ const UsersManagement = () => {
 
   const handleUpdateUser = async () => {
     try {
-      // Update user logic here
-      const updatedUsers = users.map(user => 
-        user.id === selectedUser.id 
-          ? { ...user, ...editFormData }
-          : user
-      );
-      setUsers(updatedUsers);
-      toast({
-        title: "Success",
-        description: "User updated successfully",
-      });
-      setIsEditModalOpen(false);
-      resetEditForm();
+      const response = await userAPI.admin.updateUser(selectedUser.id, editFormData);
+      
+      if (response.status) {
+        // Update local state
+        const updatedUsers = users.map(user => 
+          user.id === selectedUser.id 
+            ? { ...user, ...editFormData }
+            : user
+        );
+        setUsers(updatedUsers);
+        
+        toast({
+          title: "Success",
+          description: "User updated successfully",
+        });
+        setIsEditModalOpen(false);
+        resetEditForm();
+      } else {
+        throw new Error(response.message || 'Failed to update user');
+      }
     } catch (error) {
+      console.error('Error updating user:', error);
       toast({
         title: "Error",
-        description: "Failed to update user",
+        description: error.response?.data?.message || "Failed to update user",
         variant: "destructive",
       });
     }
@@ -248,48 +187,34 @@ const UsersManagement = () => {
 
   const handleDeleteUser = async () => {
     try {
-      const updatedUsers = users.filter(user => user.id !== deleteUserId);
-      setUsers(updatedUsers);
-      toast({
-        title: "Success",
-        description: "User deleted successfully",
-      });
-      setDeleteUserId(null);
+      const response = await userAPI.admin.deleteUser(deleteUserId);
+      
+      if (response.status) {
+        const updatedUsers = users.filter(user => user.id !== deleteUserId);
+        setUsers(updatedUsers);
+        toast({
+          title: "Success",
+          description: "User deleted successfully",
+        });
+        setDeleteUserId(null);
+      } else {
+        throw new Error(response.message || 'Failed to delete user');
+      }
     } catch (error) {
+      console.error('Error deleting user:', error);
       toast({
         title: "Error",
-        description: "Failed to delete user",
+        description: error.response?.data?.message || "Failed to delete user",
         variant: "destructive",
       });
     }
   };
 
-  const handleStatusChange = async (userId, newStatus) => {
-    try {
-      const updatedUsers = users.map(user => 
-        user.id === userId 
-          ? { ...user, status: newStatus }
-          : user
-      );
-      setUsers(updatedUsers);
-      toast({
-        title: "Success",
-        description: `User ${newStatus} successfully`,
-      });
-    } catch (error) {
-      toast({
-        title: "Error",
-        description: "Failed to update user status",
-        variant: "destructive",
-      });
-    }
-  };
+  // Status functionality removed since backend doesn't support user status
 
   const resetEditForm = () => {
     setEditFormData({
-     
       role: 'customer',
-      status: 'active',
       balance: 0
     });
     setSelectedUser(null);
@@ -409,8 +334,8 @@ const UsersManagement = () => {
                       </div>
                     </td>
                     <td className="px-6 bg-gray-900 py-4">
-                      <span className={getRoleBadge(user.role)}>
-                        {user.role}
+                      <span className={getRoleBadge(user.is_admin ? 'admin' : user.role)}>
+                        {user.is_admin ? 'admin' : user.role}
                       </span>
                     </td>
                     {/* <td className="px-6 bg-gray-900 py-4">
@@ -425,7 +350,7 @@ const UsersManagement = () => {
                       </div>
                     </td>
                     <td className="px-6 py-4 bg-gray-900 font-semibold">
-                      ${user.balance.toFixed(2)}
+                      ${Number(user.balance || 0).toFixed(2)}
                     </td>
                     <td className="px-6 py-4 text-sm bg-gray-900 text-muted-foreground">
                       {new Date(user.joined_date).toLocaleDateString()}
@@ -449,24 +374,6 @@ const UsersManagement = () => {
                             Edit User
                           </DropdownMenuItem>
                           <DropdownMenuSeparator />
-                          {user.status === 'active' && (
-                            <DropdownMenuItem 
-                              onClick={() => handleStatusChange(user.id, 'suspended')}
-                              className="text-yellow-600"
-                            >
-                              <Ban className="h-4 w-4 mr-2" />
-                              Suspend User
-                            </DropdownMenuItem>
-                          )}
-                          {user.status === 'suspended' && (
-                            <DropdownMenuItem 
-                              onClick={() => handleStatusChange(user.id, 'active')}
-                              className="text-green-600"
-                            >
-                              <CheckCircle className="h-4 w-4 mr-2" />
-                              Activate User
-                            </DropdownMenuItem>
-                          )}
                           <DropdownMenuItem 
                             onClick={() => setDeleteUserId(user.id)}
                             className="text-red-600"
@@ -497,72 +404,62 @@ const UsersManagement = () => {
           {selectedUser && (
             <div className="space-y-6">
               <div className="flex items-center gap-4">
-                <div className="w-20 h-20 rounded-full bg-primary/10 flex items-center justify-center">
-                  <User className="h-10 w-10 text-primary" />
+                <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center">
+                  <User className="h-8 w-8 text-primary" />
                 </div>
                 <div>
                   <h3 className="text-xl font-semibold">{selectedUser.name}</h3>
                   <p className="text-muted-foreground">User ID: #{selectedUser.id}</p>
-                  <div className="flex gap-2 mt-2">
-                    <span className={getRoleBadge(selectedUser.role)}>
-                      {selectedUser.role}
-                    </span>
-                    <span className={getStatusBadge(selectedUser.status)}>
-                      {selectedUser.status}
-                    </span>
-                  </div>
                 </div>
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="space-y-3">
-                  <div className="flex items-center gap-2 text-sm">
-                    <Mail className="h-4 w-4 text-muted-foreground" />
-                    <span>{selectedUser.email}</span>
-                  </div>
-                  <div className="flex items-center gap-2 text-sm">
-                    <Phone className="h-4 w-4 text-muted-foreground" />
-                    <span>{selectedUser.phone}</span>
-                  </div>
-                  <div className="flex items-center gap-2 text-sm">
-                    <MapPin className="h-4 w-4 text-muted-foreground" />
-                    <span>{selectedUser.address}</span>
+                <div className="flex items-center gap-3 p-3 bg-muted/50 rounded-lg">
+                  <Mail className="h-5 w-5 text-muted-foreground" />
+                  <div>
+                    <p className="text-sm text-muted-foreground">Email</p>
+                    <p className="font-medium">{selectedUser.email}</p>
                   </div>
                 </div>
-                <div className="space-y-3">
-                  <div className="flex items-center gap-2 text-sm">
-                    <Calendar className="h-4 w-4 text-muted-foreground" />
-                    <span>Joined: {new Date(selectedUser.joined_date).toLocaleDateString()}</span>
-                  </div>
-                  <div className="flex items-center gap-2 text-sm">
-                    <Calendar className="h-4 w-4 text-muted-foreground" />
-                    <span>Last Login: {new Date(selectedUser.last_login).toLocaleDateString()}</span>
+                <div className="flex items-center gap-3 p-3 bg-muted/50 rounded-lg">
+                  <Phone className="h-5 w-5 text-muted-foreground" />
+                  <div>
+                    <p className="text-sm text-muted-foreground">Phone</p>
+                    <p className="font-medium">{selectedUser.phone || 'Not provided'}</p>
                   </div>
                 </div>
-              </div>
-
-              <div className="grid grid-cols-3 gap-4">
-                <Card className="p-4 dark:bg-gray-900">
-                  <div className="flex items-center gap-2 mb-2">
-                    <ShoppingBag className="h-5 w-5 text-primary" />
-                    <span className="text-sm text-muted-foreground">Total Orders</span>
+                <div className="flex items-center gap-3 p-3 bg-muted/50 rounded-lg">
+                  <Calendar className="h-5 w-5 text-muted-foreground" />
+                  <div>
+                    <p className="text-sm text-muted-foreground">Joined Date</p>
+                    <p className="font-medium">{new Date(selectedUser.joined_date).toLocaleDateString()}</p>
                   </div>
-                  <p className="text-2xl font-bold">{selectedUser.total_orders}</p>
-                </Card>
-                <Card className="p-4 dark:bg-gray-900">
-                  <div className="flex items-center gap-2 mb-2">
-                    <DollarSign className="h-5 w-5 text-primary" />
-                    <span className="text-sm text-muted-foreground">Total Spent</span>
+                </div>
+                <div className="flex items-center gap-3 p-3 bg-muted/50 rounded-lg">
+                  <Shield className="h-5 w-5 text-muted-foreground" />
+                  <div>
+                    <p className="text-sm text-muted-foreground">Role</p>
+                    <p className="font-medium capitalize">{selectedUser.is_admin ? 'Admin' : selectedUser.role}</p>
                   </div>
-                  <p className="text-2xl font-bold">${selectedUser.total_spent}</p>
-                </Card>
-                <Card className="p-4 dark:bg-gray-900">
-                  <div className="flex items-center gap-2 mb-2">
-                    <DollarSign className="h-5 w-5 text-primary" />
-                    <span className="text-sm text-muted-foreground">Balance</span>
+                </div>
+                <div className="flex items-center gap-3 p-3 bg-green-50 dark:bg-green-900/20 rounded-lg">
+                  <DollarSign className="h-5 w-5 text-green-600" />
+                  <div>
+                    <p className="text-sm text-green-600 dark:text-green-400">Total Spent</p>
+                    <p className="font-bold text-lg text-green-700 dark:text-green-300">
+                      ${parseFloat(selectedUser.total_spent || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                    </p>
                   </div>
-                  <p className="text-2xl font-bold">${selectedUser.balance}</p>
-                </Card>
+                </div>
+                <div className="flex items-center gap-3 p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
+                  <ShoppingBag className="h-5 w-5 text-blue-600" />
+                  <div>
+                    <p className="text-sm text-blue-600 dark:text-blue-400">Total Orders</p>
+                    <p className="font-bold text-lg text-blue-700 dark:text-blue-300">
+                      {selectedUser.total_orders || 0}
+                    </p>
+                  </div>
+                </div>
               </div>
             </div>
           )}

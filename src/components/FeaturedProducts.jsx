@@ -4,6 +4,7 @@ import EnhancedProductCard from './EnhancedProductCard';
 import NewProductCard from './NewProductCard';
 import { newArrivalProducts } from '@/data/products';
 import { useCart } from '@/contexts/CartContext';
+import { useWishlist } from '@/contexts/WishlistContext';
 import { useToast } from '@/hooks/use-toast';
 import Icon from '@/components/AppIcon';
 import Button from '@/components/ui/Button';
@@ -14,6 +15,7 @@ import { getLatestProducts, formatProductsForDisplay } from '@/utils/productUtil
 
 const FeaturedProducts = () => {
   const { addToCart } = useCart();
+  const { toggleWishlist, isProductWishlisted } = useWishlist();
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -45,23 +47,21 @@ const FeaturedProducts = () => {
   const featuredProducts = products;
 
   const handleQuickAdd = (product) => {
-    // Add with default size and color
-    const defaultSize = product.sizes[0];
-    const defaultColor = product.colors[0];
-    
+    // Pass product info to CartContext
+    // For authenticated users, CartContext will fetch specifications and use the first one
+    // For guests, it will use the local cart with default values
     addToCart({
       id: product.id,
       name: product.name,
       price: product.price,
       image: product.image,
-      size: defaultSize,
-      color: defaultColor,
-      category: product.category
+      category: product.category,
+      // For backwards compatibility with local cart (guests)
+      size: product.sizes?.[0] || 'Default',
+      color: product.colors?.[0] || 'Default',
     });
 
-    toast.success(
-      "Added to cart "+ `${product.name} has been added to your cart.`,
-    "")
+    // Success toast is now handled by CartContext
   };
 
   return (

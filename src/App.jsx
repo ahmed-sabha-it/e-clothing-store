@@ -38,6 +38,7 @@ import AdminPage from "./pages/admin";
 
 import AdminRoute from "./pages/admin/components/AdminRoute";
 import UserOnlyRoute from "./components/UserOnlyRoute";
+import AuthRequiredRoute from "./components/AuthRequiredRoute";
 
 const queryClient = new QueryClient();
 
@@ -71,7 +72,11 @@ const App = () => (
                           <Route path="/category/:category" element={<CategoryPage />} />
                           <Route path="/product/:id" element={<ProductDetail />} />
                           <Route path="/cart" element={<CartPage />} />
-                          <Route path="/checkout" element={<CheckoutPage />} />
+                          <Route path="/checkout" element={
+                            <AuthRequiredRoute>
+                              <CheckoutPage />
+                            </AuthRequiredRoute>
+                          } />
                           <Route path="/wishlist" element={<WishlistPage />} />
                           <Route path="/search" element={<SearchPage />} />
                           {/* Static Pages */}
@@ -88,7 +93,11 @@ const App = () => (
                           <Route path="/reset-password" element={<ResetPassword />} />
                           <Route path="/change-password" element={<ChangePassword />} />
                           {/* Profile Page */}
-                          <Route path="/profile" element={<UserProfileManagement />} />
+                          <Route path="/profile" element={
+                            <AuthRequiredRoute>
+                              <UserProfileManagement />
+                            </AuthRequiredRoute>
+                          } />
                           <Route path="*" element={<NotFound />} />
                         </Routes>
                       </main>

@@ -6,6 +6,7 @@ import NewProductCard from "@/components/NewProductCard"
 import { getProductsByCategory } from '@/data/products';
 import { getSaleProductsByCategory } from '@/data/salesProducts';
 import { useCart } from '@/contexts/CartContext';
+import { useWishlist } from '@/contexts/WishlistContext';
 import { useToast } from '@/hooks/use-toast';
 import { Filter, X } from 'lucide-react';
 import { Spinner } from '@/components/ui/spinner';
@@ -17,6 +18,7 @@ const CategoryPage = () => {
   useScrollToTop();
   const { category } = useParams();
   const { addToCart } = useCart();
+  const { toggleWishlist, isProductWishlisted } = useWishlist();
   const { toast } = useToast();
   
   const [allProducts, setAllProducts] = useState([]);
@@ -77,23 +79,21 @@ const CategoryPage = () => {
   }, [category]);
 
   const handleQuickAdd = (product) => {
-    const defaultSize = product.sizes[0];
-    const defaultColor = product.colors[0];
-    
+    // Pass product info to CartContext
+    // For authenticated users, CartContext will fetch specifications and use the first one
+    // For guests, it will use the local cart with default values
     addToCart({
       id: product.id,
       name: product.name,
       price: product.price,
       image: product.image,
-      size: defaultSize,
-      color: defaultColor,
-      category: product.category
+      category: product.category,
+      // For backwards compatibility with local cart (guests)
+      size: product.sizes?.[0] || 'Default',
+      color: product.colors?.[0] || 'Default',
     });
 
-    toast({
-      title: "Added to cart",
-      description: `${product.name} has been added to your cart.`,
-    });
+    // Success toast is now handled by CartContext
   };
 
   const filteredProducts = allProducts

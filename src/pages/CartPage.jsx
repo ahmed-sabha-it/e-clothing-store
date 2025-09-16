@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useCart } from '@/contexts/CartContext';
-import { Trash2, Plus, Minus, ShoppingBag, Tag, X } from 'lucide-react';
+import { useAuth } from '@/contexts/AuthContext';
+import { Trash2, Plus, Minus, ShoppingBag, Tag, X, LogIn } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/Button1';
 import { Input } from '@/components/ui/input';
@@ -8,6 +9,7 @@ import { useScrollToTop } from '../utils/scrollToTop';
 
 const CartPage = () => {
   useScrollToTop();
+  const { user } = useAuth();
   const { 
     cartItems, 
     updateQuantity, 
@@ -50,87 +52,118 @@ const CartPage = () => {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         {/* Cart Items */}
         <div className="lg:col-span-2 space-y-6 animate-fade-in animation-delay-300">
-          {cartItems.map((item, index) => (
-            <div 
-              key={`${item.id}-${item.size}-${item.color}`} 
-              className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-6 shadow-sm hover:shadow-md transition-shadow duration-200 animate-fade-in"
-              style={{ animationDelay: `${450 + (index * 100)}ms` }}
-            >
-              <div className="flex gap-6">
-                <div className="relative">
-                  <img
-                    src={item.image}
-                    alt={item.name}
-                    className="w-32 h-32 object-cover rounded-lg"
-                  />
-                  <div className="absolute -top-2 -right-2 bg-primary text-primary-foreground text-xs px-2 py-1 rounded-full">
-                    {item.quantity}
-                  </div>
-                </div>
-                
-                <div className="flex-1 space-y-3">
-                  <div>
-                    <h3 className="text-lg font-semibold text-foreground hover:text-primary transition-colors">
-                      <Link to={`/product/${item.id}`}>{item.name}</Link>
-                    </h3>
-                    <p className="text-sm text-muted-foreground capitalize flex items-center gap-1">
-                      <span className="inline-block w-2 h-2 rounded-full bg-muted-foreground"></span>
-                      {item.category}
-                    </p>
+          {cartItems.map((item, index) => {
+            // Determine the key based on whether it's a server or local item
+            const itemKey = user 
+              ? `server-${item.cartItemId || item.id}` 
+              : `local-${item.id}-${item.size}-${item.color}`;
+            
+            return (
+              <div 
+                key={itemKey}
+                className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-6 shadow-sm hover:shadow-md transition-shadow duration-200 animate-fade-in"
+                style={{ animationDelay: `${450 + (index * 100)}ms` }}
+              >
+                <div className="flex gap-6">
+                  <div className="relative">
+                    <img
+                      src={item.image}
+                      alt={item.name}
+                      className="w-32 h-32 object-cover rounded-lg"
+                    />
+                    <div className="absolute -top-2 -right-2 bg-primary text-primary-foreground text-xs px-2 py-1 rounded-full">
+                      {item.quantity}
+                    </div>
                   </div>
                   
-                  <div className="flex items-center gap-4 text-sm">
-                    <div className="flex items-center gap-2">
-                      <span className="text-muted-foreground">Size:</span>
-                      <span className="bg-muted px-2 py-1 rounded text-xs font-medium">{item.size || 'N/A'}</span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <span className="text-muted-foreground">Color:</span>
-                      <div className="flex items-center gap-1">
-                        <div 
-                          className="w-4 h-4 rounded-full border border-border"
-                          style={{ backgroundColor: item.color?.toLowerCase() || '#gray' }}
-                        />
-                        <span className="capitalize text-xs font-medium">{item.color || 'N/A'}</span>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-2">
-                      <span className="text-2xl font-bold text-foreground">${item.price}</span>
-                      <span className="text-sm text-muted-foreground">each</span>
+                  <div className="flex-1 space-y-3">
+                    <div>
+                      <h3 className="text-lg font-semibold text-foreground hover:text-primary transition-colors">
+                        <Link to={`/product/${item.productId || item.id}`}>{item.name}</Link>
+                      </h3>
+                      <p className="text-sm text-muted-foreground capitalize flex items-center gap-1">
+                        <span className="inline-block w-2 h-2 rounded-full bg-muted-foreground"></span>
+                        {item.category}
+                      </p>
                     </div>
                     
-                    <div className="flex items-center  gap-3">
-                      <div className="flex items-center  bg-primary rounded-full border border-border rounded-lg bg-background">
-                        <button
-                          onClick={() => updateQuantity(item.id, item.size, item.color, Math.max(0, item.quantity - 1))}
-                          className="px-3 py-2 bg-primary hover:bg-muted transition-colors"
-                        >
-                          <Minus className="" />
-                        </button>
-                        <span className="px-3 py-2 bg-primary text-sm font-medium">{item.quantity}</span>
-                        <button
-                          onClick={() => updateQuantity(item.id, item.size, item.color, item.quantity + 1)}
-                          className="px-3 py-2 hover:bg-muted bg-primary transition-colors"
-                        >
-                          <Plus className="rounded-all border-left-1 border-1 border-white" />
-                        </button>
+                    <div className="flex items-center gap-4 text-sm">
+                      {user && item.specName ? (
+                        // For authenticated users with server cart
+                        <div className="flex items-center gap-2">
+                          <span className="text-muted-foreground">{item.specName}:</span>
+                          <span className="bg-muted px-2 py-1 rounded text-xs font-medium">
+                            {item.specValue}
+                          </span>
+                        </div>
+                      ) : (
+                        // For guests with local cart
+                        <>
+                          <div className="flex items-center gap-2">
+                            <span className="text-muted-foreground">Size:</span>
+                            <span className="bg-muted px-2 py-1 rounded text-xs font-medium">{item.size || 'N/A'}</span>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <span className="text-muted-foreground">Color:</span>
+                            <div className="flex items-center gap-1">
+                              <div 
+                                className="w-4 h-4 rounded-full border border-border"
+                                style={{ backgroundColor: item.color?.toLowerCase() || '#gray' }}
+                              />
+                              <span className="capitalize text-xs font-medium">{item.color || 'N/A'}</span>
+                            </div>
+                          </div>
+                        </>
+                      )}
+                    </div>
+
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <span className="text-2xl font-bold text-foreground">
+                          ${(item.unitPrice || item.price).toFixed(2)}
+                        </span>
+                        <span className="text-sm text-muted-foreground">each</span>
                       </div>
                       
-                      <button
-                        onClick={() => removeFromCart(item.id, item.size, item.color)}
-                        className="p-2 text-muted-foreground hover:text-destructive transition-colors"
-                      >
-                        <Trash2 className="h-4 w-4" />
-                      </button>
+                      <div className="flex items-center  gap-3">
+                        <div className="flex items-center  bg-primary rounded-full border border-border rounded-lg bg-background">
+                          <button
+                            onClick={() => {
+                              const cartId = user ? item.cartItemId : item.id;
+                              updateQuantity(cartId, item.size, item.color, Math.max(0, item.quantity - 1));
+                            }}
+                            className="px-3 py-2 bg-primary hover:bg-muted transition-colors"
+                          >
+                            <Minus className="" />
+                          </button>
+                          <span className="px-3 py-2 bg-primary text-sm font-medium">{item.quantity}</span>
+                          <button
+                            onClick={() => {
+                              const cartId = user ? item.cartItemId : item.id;
+                              updateQuantity(cartId, item.size, item.color, item.quantity + 1);
+                            }}
+                            className="px-3 py-2 hover:bg-muted bg-primary transition-colors"
+                          >
+                            <Plus className="rounded-all border-left-1 border-1 border-white" />
+                          </button>
+                        </div>
+                        
+                        <button
+                          onClick={() => {
+                            const cartId = user ? item.cartItemId : item.id;
+                            removeFromCart(cartId, item.size, item.color);
+                          }}
+                          className="p-2 text-muted-foreground hover:text-destructive transition-colors"
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </button>
+                      </div>
                     </div>
                   </div>
                 </div>
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
 
         {/* Order Summary */}
@@ -230,9 +263,26 @@ const CartPage = () => {
               </div>
             </div>
 
-            <Link to="/checkout" className="w-full orange-button py-3 text-lg block text-center">
-              Proceed to Checkout
-            </Link>
+            {user ? (
+              <Link to="/checkout" className="w-full orange-button py-3 text-lg block text-center">
+                Proceed to Checkout
+              </Link>
+            ) : (
+              <div className="space-y-3">
+                <div className="p-4 bg-orange-50 dark:bg-orange-900/20 border border-orange-200 dark:border-orange-800 rounded-lg">
+                  <div className="flex items-center gap-2 text-orange-800 dark:text-orange-200 mb-2">
+                    <LogIn className="h-4 w-4" />
+                    <span className="text-sm font-medium">Sign in required</span>
+                  </div>
+                  <p className="text-sm text-orange-700 dark:text-orange-300">
+                    Please sign in to proceed with checkout
+                  </p>
+                </div>
+                <Link to="/signin" className="w-full orange-button py-3 text-lg block text-center">
+                  Sign In to Checkout
+                </Link>
+              </div>
+            )}
             
             <Link to="/category/all" className="w-full mt-3 text-center text-sm text-muted-foreground hover:text-foreground transition-colors duration-200 block">
               Continue Shopping

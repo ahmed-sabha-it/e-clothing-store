@@ -14,13 +14,13 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { ToastContainer, toast } from 'react-toastify';
 import PageTitle from "@/components/PageTitle";
-
+// import  ScrollToTop  from "../../utils/scrollToTop"
 import { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider } from "@/components/ui/tooltip";
 import { authAPI } from "../../lib/api";
 // import { title } from "process";
-
+import Cookies from 'js-cookie'
 const SignUp = () => {
-  useScrollToTop();
+  // useScrollToTop();
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
