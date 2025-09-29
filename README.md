@@ -92,12 +92,3 @@ The frontend integrates with a Laravel backend API with the following main endpo
 - Users: `/api/users/*`
 - Coupons: `/api/coupons/*`
 
-## Development Team
-
-- أحمد صبحه (Ahmed Sobha)
-- براءة رحيمو (Baraa Rahimo)
-- غزل سلطان (Ghazal Sultan)
-
-## License
-
-This project is developed as a mid-term project for educational purposes.
