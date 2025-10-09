@@ -1,73 +1,94 @@
-# Welcome to your Lovable project
+# E-Clothing Store Frontend
 
-## Project info
+A modern e-commerce clothing store built with React and Vite, featuring user authentication, admin dashboard, shopping cart, and order management.
 
-**URL**: https://lovable.dev/projects/f5ce0123-9f7c-4c82-8d17-1cdc59bb6d93
+## ⚠️ ملاحظة مهمة قبل تشغيل المشروع
 
-## How can I edit this code?
+**قبل تشغيل المشروع:**
+1. نفّذ `npm install`
+2. إذا ظهرت مشاكل بالإصدارات، احذف `package-lock.json` ثم نفّذ `npm install` مرة أخرى
 
-There are several ways of editing your application.
+## Features
 
-**Use Lovable**
+- **User Authentication**: Login, register, password reset
+- **Shopping Cart**: Add to cart, manage quantities, apply coupons
+- **Product Management**: Browse products, view details, filter by categories
+- **Admin Dashboard**: Complete admin panel for managing products, categories, users, orders, and coupons
+- **Order System**: Place orders, view order history
+- **Responsive Design**: Mobile-friendly interface
+- **Real-time Updates**: Dynamic content with API integration
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/f5ce0123-9f7c-4c82-8d17-1cdc59bb6d93) and start prompting.
+## Technologies Used
 
-Changes made via Lovable will be committed automatically to this repo.
+- **React 18** - Frontend framework
+- **Vite** - Build tool and development server
+- **TypeScript** - Type safety
+- **Tailwind CSS** - Styling framework
+- **shadcn/ui** - UI component library
+- **React Router** - Client-side routing
+- **Context API** - State management
+- **Axios** - HTTP client for API calls
 
-**Use your preferred IDE**
+## Installation & Setup
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+1. **Clone the repository**
+   ```bash
+   git clone <repository-url>
+   cd frontend
+   ```
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+2. **Install dependencies**
+   ```bash
+   npm install
+   ```
 
-Follow these steps:
+3. **Start development server**
+   ```bash
+   npm run dev
+   ```
 
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
+4. **Build for production**
+   ```bash
+   npm run build
+   ```
 
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
+## Project Structure
 
-# Step 3: Install the necessary dependencies.
-npm i
-
-# Step 4: Start the development server with auto-reloading and an instant preview.
-npm run dev
+```
+src/
+├── components/          # Reusable UI components
+│   ├── ui/             # shadcn/ui components
+│   ├── Header.jsx      # Navigation header
+│   ├── Footer.jsx      # Site footer
+│   └── ...
+├── contexts/           # React contexts
+│   ├── AuthContext.jsx # Authentication state
+│   ├── CartContext.jsx # Shopping cart state
+│   └── ThemeContext.jsx # Theme management
+├── pages/              # Page components
+├── data/               # Static data and mock data
+├── hooks/              # Custom React hooks
+├── utils/              # Utility functions
+└── api.js              # API configuration and endpoints
 ```
 
-**Edit a file directly in GitHub**
+## Admin Features
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+The admin dashboard includes:
+- **Product Management**: CRUD operations for products and specifications
+- **Category Management**: Manage product categories
+- **User Management**: View and manage user accounts
+- **Order Management**: Process and track orders
+- **Coupon Management**: Create and manage discount coupons
+- **Analytics Dashboard**: Sales overview and statistics
 
-**Use GitHub Codespaces**
+## API Integration
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+The frontend integrates with a Laravel backend API with the following main endpoints:
+- Authentication: `/api/auth/*`
+- Products: `/api/products/*`
+- Categories: `/api/categories/*`
+- Orders: `/api/orders/*`
+- Users: `/api/users/*`
+- Coupons: `/api/coupons/*`
 
-## What technologies are used for this project?
-
-This project is built with:
-
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
-
-## How can I deploy this project?
-
-Simply open [Lovable](https://lovable.dev/projects/f5ce0123-9f7c-4c82-8d17-1cdc59bb6d93) and click on Share -> Publish.
-
-## Can I connect a custom domain to my Lovable project?
-
-Yes, you can!
-
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
-
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/tips-tricks/custom-domain#step-by-step-guide)
