@@ -143,7 +143,6 @@ const UserProfileManagement = () => {
     },
     shopping: {
       currency: 'USD',
-      language: 'en',
       defaultShipping: 'standard',
       autoSaveToWishlist: false,
       showOutOfStock: true
